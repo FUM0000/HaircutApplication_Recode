@@ -51,8 +51,28 @@
                                         label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search"
                                         @click:clear="clearSearch"
                                         :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
+                                    <v-btn color="primary" @click="showAddCustomerDialog = true" class="ml-4">新規追加</v-btn>
                                 </v-col>
                             </v-row>
+
+                            <v-dialog v-model="showAddCustomerDialog" max-width="400px" persistent>
+                                <v-card>
+                                    <v-card-title class="headline">新規顧客追加</v-card-title>
+                                    <v-card-text>
+                                        <v-text-field v-model="newCustomerName" label="氏名" required></v-text-field>
+                                        <v-text-field v-model="newCustomerNameKana" label="カタカナ"
+                                            required></v-text-field>
+                                        <v-text-field v-model="newCustomerPhone" label="電話番号" required></v-text-field>
+                                    </v-card-text>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="primary" :disabled="!newCustomerName || !newCustomerNameKana"
+                                            @click="addCustomer">追加</v-btn>
+                                        <v-btn color="grey darken-1"
+                                            @click="showAddCustomerDialog = false">キャンセル</v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
 
                             <v-row>
                                 <v-col class="d-flex justify-center">
@@ -65,6 +85,10 @@
                                         <div class="index-item" :class="{ 'active': activeIndex === -1 }"
                                             @click="filterByIndex(null)">
                                             全て
+                                        </div>
+                                        <div class="index-item sort" :class="{ 'active': sortDirection === 'asc' }"
+                                            @click="toggleSortDirection">
+                                            {{ sortDirection === 'asc' ? '昇順' : '降順' }}
                                         </div>
                                     </div>
                                 </v-col>
@@ -205,6 +229,14 @@
         .theme--light.v-pagination .v-pagination__navigation {
             background-color: #d0ece2;
         }
+
+        .sort.active {
+            background-color: #a0c0d0;
+        }
+
+        .sort {
+            background-color: #d0a0c0;
+        }
     </style>
     <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
 
@@ -252,6 +284,12 @@
                 activeIndex: -1,
                 indexChars: ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'],
                 paginationColor: '#a0d0c0',
+                sortDirection: 'asc',
+
+                showAddCustomerDialog: false,
+                newCustomerName: '',
+                newCustomerNameKana: '',
+                newCustomerPhone: '',
             },
             computed: {
                 currentPageCustomers() {
@@ -275,13 +313,15 @@
                             return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText) || customer.phone.toLowerCase().includes(searchText);
                         });
                     }
-                    
+
+                    this.sortCustomers(); // Call the sortCustomers method
                     this.page = 1; // Reset page to 1 when search text changes
                     this.activeIndex = -1; // Reset active index
                 },
                 clearSearch() {
                     this.searchText = '';
                     this.filteredCustomers = this.customers;
+                    this.sortCustomers(); // Call the sortCustomers method
                     this.page = 1; // Reset page to 1 when search is cleared
                     this.activeIndex = -1; // Reset active index
                 },
@@ -312,12 +352,49 @@
                         });
                         this.activeIndex = this.indexChars.indexOf(char);
                     }
+                    this.sortCustomers(); // Call the sortCustomers method
                     this.page = 1; // Reset page to 1 when filtering by index
+                },
+                sortCustomers() {
+                    this.filteredCustomers.sort((a, b) => {
+                        if (this.sortDirection === 'asc') {
+                            if (a.nameKana < b.nameKana) return -1;
+                            if (a.nameKana > b.nameKana) return 1;
+                        } else {
+                            if (a.nameKana < b.nameKana) return 1;
+                            if (a.nameKana > b.nameKana) return -1;
+                        }
+                        return 0;
+                    });
+                },
+                toggleSortDirection() {
+                    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+                    this.sortCustomers();
+                },
+
+                addCustomer() {
+                    if (this.newCustomerName && this.newCustomerNameKana) {
+                        this.customers.push({
+                            id: this.customers.length + 1,
+                            name: this.newCustomerName,
+                            nameKana: this.newCustomerNameKana,
+                            phone: this.newCustomerPhone,
+                        });
+                        this.filteredCustomers = this.customers;
+                        this.sortCustomers();
+                        this.page = 1;
+                        this.activeIndex = -1;
+                        this.newCustomerName = '';
+                        this.newCustomerNameKana = '';
+                        this.newCustomerPhone = '';
+                        this.showAddCustomerDialog = false;
+                    }
                 },
             },
             mounted() {
                 $(window).ready(() => { this.show_page = true; });
-                this.filteredCustomers = this.customers; // Initialize filteredCustomers with all customers
+                this.filteredCustomers = this.customers;
+                this.sortCustomers(); // Call the sortCustomers method
             },
         });
     </script>
