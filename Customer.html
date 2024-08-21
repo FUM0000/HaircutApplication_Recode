@@ -48,7 +48,7 @@
                             <v-row>
                                 <v-col class="d-flex justify-center" style="margin-top: 10px">
                                     <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
-                                        label="顧客検索" solo rounded clearable @input="search" @click:clear="clearSearch"
+                                        label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search" @click:clear="clearSearch"
                                         :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
                                 </v-col>
                             </v-row>
@@ -270,7 +270,7 @@
                     } else {
                         this.filteredCustomers = this.customers.filter(customer => {
                             const searchText = this.searchText.toLowerCase();
-                            return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText);
+                            return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText) || customer.phone.toLowerCase().includes(searchText);
                         });
                     }
                     this.page = 1; // Reset page to 1 when search text changes

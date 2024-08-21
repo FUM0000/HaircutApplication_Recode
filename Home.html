@@ -65,7 +65,7 @@
                             <v-row>
                                 <v-col class="d-flex justify-center" style="margin-top: 100px">
                                     <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
-                                        label="顧客検索" solo rounded clearable @input="search" @click:clear="clearSearch"
+                                        label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search" @click:clear="clearSearch"
                                         :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
                                 </v-col>
                             </v-row>
@@ -107,7 +107,6 @@
 
     <!-- ▼ Style ▼ ------------------------------------------------------------------------------------>
     <style>
-
         /* Fade */
         .fade-page-enter-active,
         .fade-page-leave-active {
@@ -197,41 +196,16 @@
                 searchText: '',
                 customers: [
                     { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
                     { id: 2, name: '佐藤 花子', nameKana: 'サトウ ハナコ', phone: '080-9876-5432' },
                     { id: 3, name: '鈴木 次郎', nameKana: 'スズキ ジロウ', phone: '070-5678-1234' },
                     { id: 4, name: '田中 三郎', nameKana: 'タナカ サブロウ', phone: '060-1234-9876' },
+                    { id: 5, name: '山本 四郎', nameKana: 'ヤマモト シロウ', phone: '090-5678-1234' },
+                    { id: 6, name: '斎藤 五郎', nameKana: 'サイトウ ゴロウ', phone: '080-1234-5678' },
+                    { id: 7, name: '高橋 六郎', nameKana: 'タカハシ ロクロウ', phone: '070-9876-5432' },
+                    { id: 8, name: '伊藤 七郎', nameKana: 'イトウ シチロウ', phone: '060-5678-1234' },
+                    { id: 9, name: '中村 八郎', nameKana: 'ナカムラ ハチロウ', phone: '090-1234-9876' },
+                    { id: 10, name: '小林 九郎', nameKana: 'コバヤシ クロウ', phone: '080-5678-1234' },
+                    { id: 11, name: '渡辺 十郎', nameKana: 'ワタナベ ジュウロウ', phone: '070-1234-5678' },
                 ],
                 filteredCustomers: [],
             },
@@ -248,7 +222,7 @@
                     } else {
                         this.filteredCustomers = this.customers.filter(customer => {
                             const searchText = this.searchText.toLowerCase();
-                            return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText);
+                            return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText) || customer.phone.toLowerCase().includes(searchText);
                         });
                     }
                 },
