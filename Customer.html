@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+
+<!-- ▼ Head ▼ ------------------------------------------------------------------------------------->
+
+<head>
+    <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
+
+    <!-- ▼ Setting ▼ ---------------------------------------------------------------------------------->
+    <meta name="version" content="0.0.1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- ▲ Setting ▲ ---------------------------------------------------------------------------------->
+
+    <!-- ▼ Reference ▼ -------------------------------------------------------------------------------->
+    <!-- Vue -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link href="./Asset/CSS/Common_1.css" rel="stylesheet" />
+    <!-- ▲ Reference ▲ -------------------------------------------------------------------------------->
+</head>
+<!-- ▲ Head ▲ ------------------------------------------------------------------------------------->
+
+<!-- ▼ Body ▼ ------------------------------------------------------------------------------------->
+
+<body>
+    <!-- ▼ App ▼ -------------------------------------------------------------------------------------->
+    <v-app id="app">
+        <template>
+            <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
+            <main-system-bar :drawer="drawer" @change-drawer="Change_Drawer"><v-icon>mdi-account-circle</v-icon>
+                顧客一覧</main-system-bar>
+            <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
+
+            <!-- ▼ Navigation ▼ ------------------------------------------------------------------------------->
+            <main-navigation :drawer="drawer" @change-drawer="Change_Drawer"></main-navigation>
+            <!-- ▲ Navigation ▲ ------------------------------------------------------------------------------->
+
+            <!-- ▼ Main ▼ ------------------------------------------------------------------------------------->
+            <v-main id="main">
+                <v-container id="main-container" class="d-flex flex-column" fluid fill-height>
+                    <transition name="fade-page">
+                        <div v-show="show_page" style="width: 100%;">
+                            <v-row>
+                                <v-col class="d-flex justify-center" style="margin-top: 10px">
+                                    <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
+                                        label="顧客検索" solo rounded clearable @input="search" @click:clear="clearSearch"
+                                        :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
+                                </v-col>
+                            </v-row>
+
+                            <v-row>
+                                <v-col class="d-flex justify-center">
+                                    <div class="index-wrapper">
+                                        <div class="index-item" :class="{ 'active': activeIndex === index }"
+                                            v-for="(char, index) in indexChars" :key="index"
+                                            @click="filterByIndex(char)">
+                                            {{ char }}
+                                        </div>
+                                        <div class="index-item" :class="{ 'active': activeIndex === -1 }"
+                                            @click="filterByIndex(null)">
+                                            全て
+                                        </div>
+                                    </div>
+                                </v-col>
+                            </v-row>
+
+                            <v-row>
+                                <v-col class="d-flex justify-center">
+                                    <v-simple-table :style="{ 'max-width': '512px', 'width': '80%' }">
+                                        <template v-slot:default>
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-left" style="width: 50%;">氏名</th>
+                                                    <th class="text-left" style="width: 50%;">電話番号</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="customer in currentPageCustomers" :key="customer.id">
+                                                    <td>{{ customer.name }}</td>
+                                                    <td>{{ customer.phone }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </template>
+                                    </v-simple-table>
+                                </v-col>
+                            </v-row>
+
+                            <v-row>
+                                <v-col class="d-flex justify-center">
+                                    <v-pagination v-model="page" :length="Math.ceil(filteredCustomers.length / 10)"
+                                        :total-visible="11" circle @input="updatePage" :color="paginationColor">
+                                    </v-pagination>
+                                </v-col>
+                            </v-row>
+
+                        </div>
+                    </transition>
+                </v-container>
+            </v-main>
+            <!-- ▲ Main ▲ ------------------------------------------------------------------------------------->
+        </template>
+    </v-app>
+    <!-- ▲ App ▲ -------------------------------------------------------------------------------------->
+
+    <!-- ▼ Style ▼ ------------------------------------------------------------------------------------>
+    <style>
+        /* Fade */
+        .fade-page-enter-active,
+        .fade-page-leave-active {
+            transition: opacity 2s;
+        }
+
+        .fade-page-enter,
+        .fade-page-leave-to {
+            opacity: 0;
+        }
+
+        .search-field>>>.v-input__prepend-outer {
+            margin-right: 8px;
+        }
+
+        .search-field>>>.v-input__slot {
+            border-radius: 25px;
+        }
+
+        .search-field>>>.v-input__icon--prepend {
+            margin-left: 16px;
+        }
+
+        table {
+            background-color: #e6f4ed;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+        }
+
+        thead,
+        tbody {
+            padding: 12px 16px;
+        }
+
+        thead {
+            background-color: #d0ece2;
+            font-weight: 500;
+        }
+
+        tbody {
+            border-bottom: 1px solid #c2e0d6;
+        }
+
+        td {
+            user-select: all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .index-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .index-item {
+            padding: 8px 12px;
+            margin: 0 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            background-color: #d0ece2;
+            color: #333;
+        }
+
+        .index-item.active {
+            background-color: #a0d0c0;
+            font-weight: 500;
+        }
+
+        .v-pagination__item {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 8px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 50%;
+            color: #333;
+            background-color: #c2e0d6;
+        }
+
+        .v-pagination__item--active {
+            background-color: #a0d0c0;
+            color: #fff;
+        }
+
+        .theme--light.v-pagination .v-pagination__item {
+            background-color: #d0ece2;
+        }
+
+        .theme--light.v-pagination .v-pagination__navigation {
+            background-color: #d0ece2;
+        }
+    </style>
+    <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
+
+    <!-- ▼ Script Reference ▼ ------------------------------------------------------------------------->
+    <!-- Main -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vector-js@4.1.1/dist/vector.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <!-- Compornent -->
+    <script src="./Asset/Javascript/common.js"></script>
+    <script src="./Asset/Javascript/main-system-bar.js"></script>
+    <script src="./Asset/Javascript/main-navigation.js"></script>
+    <!-- ▲ Script Reference ▲ ------------------------------------------------------------------------->
+
+    <!-- ▼ Script Content ▼ --------------------------------------------------------------------------->
+    <script>
+        // Variable ----------------------------------------------------------------------
+        let vue = new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                // Determined
+                drawer: false,
+                // Myself
+                show_page: false,
+
+                searchText: '',
+                customers: [
+                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
+                    { id: 2, name: '佐藤 花子', nameKana: 'サトウ ハナコ', phone: '080-9876-5432' },
+                    { id: 3, name: '鈴木 次郎', nameKana: 'スズキ ジロウ', phone: '070-5678-1234' },
+                    { id: 4, name: '田中 三郎', nameKana: 'タナカ サブロウ', phone: '060-1234-9876' },
+                    { id: 5, name: '山本 四郎', nameKana: 'ヤマモト シロウ', phone: '090-5678-1234' },
+                    { id: 6, name: '斎藤 五郎', nameKana: 'サイトウ ゴロウ', phone: '080-1234-5678' },
+                    { id: 7, name: '高橋 六郎', nameKana: 'タカハシ ロクロウ', phone: '070-9876-5432' },
+                    { id: 8, name: '伊藤 七郎', nameKana: 'イトウ シチロウ', phone: '060-5678-1234' },
+                    { id: 9, name: '中村 八郎', nameKana: 'ナカムラ ハチロウ', phone: '090-1234-9876' },
+                    { id: 10, name: '小林 九郎', nameKana: 'コバヤシ クロウ', phone: '080-5678-1234' },
+                    { id: 11, name: '渡辺 十郎', nameKana: 'ワタナベ ジュウロウ', phone: '070-1234-5678' },
+                ],
+                filteredCustomers: [],
+                page: 1,
+                activeIndex: -1,
+                indexChars: ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'],
+                paginationColor: '#a0d0c0',
+            },
+            computed: {
+                currentPageCustomers() {
+                    const startIndex = (this.page - 1) * 10;
+                    const endIndex = startIndex + 10;
+                    return this.filteredCustomers.slice(startIndex, endIndex);
+                },
+            },
+            methods: {
+                // System
+                Change_Drawer(_value) {
+                    this.drawer = _value;
+                },
+
+                search() {
+                    if (this.searchText.trim() === '') {
+                        this.filteredCustomers = this.customers;
+                    } else {
+                        this.filteredCustomers = this.customers.filter(customer => {
+                            const searchText = this.searchText.toLowerCase();
+                            return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText);
+                        });
+                    }
+                    this.page = 1; // Reset page to 1 when search text changes
+                    this.activeIndex = -1; // Reset active index
+                },
+                clearSearch() {
+                    this.searchText = '';
+                    this.filteredCustomers = this.customers;
+                    this.page = 1; // Reset page to 1 when search is cleared
+                    this.activeIndex = -1; // Reset active index
+                },
+                updatePage(page) {
+                    this.page = page;
+                },
+                filterByIndex(char) {
+                    if (char === null) {
+                        this.filteredCustomers = this.customers;
+                        this.activeIndex = -1;
+                    } else {
+                        const indexMap = {
+                            'あ': ['ア', 'イ', 'ウ', 'エ', 'オ'],
+                            'か': ['カ', 'キ', 'ク', 'ケ', 'コ'],
+                            'さ': ['サ', 'シ', 'ス', 'セ', 'ソ'],
+                            'た': ['タ', 'チ', 'ツ', 'テ', 'ト'],
+                            'な': ['ナ', 'ニ', 'ヌ', 'ネ', 'ノ'],
+                            'は': ['ハ', 'ヒ', 'フ', 'ヘ', 'ホ'],
+                            'ま': ['マ', 'ミ', 'ム', 'メ', 'モ'],
+                            'や': ['ヤ', 'ユ', 'ヨ'],
+                            'ら': ['ラ', 'リ', 'ル', 'レ', 'ロ'],
+                            'わ': ['ワ'],
+                        };
+
+                        this.filteredCustomers = this.customers.filter(customer => {
+                            const firstChar = customer.nameKana.charAt(0).toUpperCase();
+                            return indexMap[char].includes(firstChar);
+                        });
+                        this.activeIndex = this.indexChars.indexOf(char);
+                    }
+                    this.page = 1; // Reset page to 1 when filtering by index
+                },
+            },
+            mounted() {
+                $(window).ready(() => { this.show_page = true; });
+                this.filteredCustomers = this.customers; // Initialize filteredCustomers with all customers
+            },
+        });
+    </script>
+    <!-- ▲ Script Content ▲ --------------------------------------------------------------------------->
+</body>
+<!-- ▲ Body ▲ ------------------------------------------------------------------------------------->
+
+</html>

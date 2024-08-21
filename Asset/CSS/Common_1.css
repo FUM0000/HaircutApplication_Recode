@@ -1,0 +1,8 @@
+html { user-select: none; }
+html::-webkit-scrollbar{
+    display:none;
+}
+
+body { background: rgb(216, 238, 221); }
+#app { background-color: rgb(216, 238, 221); }
+.v-application { background-color: rgb(216, 238, 221); }
