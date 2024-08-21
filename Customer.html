@@ -46,16 +46,17 @@
                     <transition name="fade-page">
                         <div v-show="show_page" style="width: 100%;">
                             <v-row>
-                                <v-col class="d-flex justify-center" style="margin-top: 10px">
+                                <v-col class="d-flex justify-center" style="margin-top: 25px">
                                     <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
-                                        label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search" @click:clear="clearSearch"
+                                        label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search"
+                                        @click:clear="clearSearch"
                                         :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
                                 </v-col>
                             </v-row>
 
                             <v-row>
                                 <v-col class="d-flex justify-center">
-                                    <div class="index-wrapper">
+                                    <div class="index-wrapper" :style="{ 'flex-wrap': 'wrap' }">
                                         <div class="index-item" :class="{ 'active': activeIndex === index }"
                                             v-for="(char, index) in indexChars" :key="index"
                                             @click="filterByIndex(char)">
@@ -93,7 +94,8 @@
                             <v-row>
                                 <v-col class="d-flex justify-center">
                                     <v-pagination v-model="page" :length="Math.ceil(filteredCustomers.length / 10)"
-                                        :total-visible="11" circle @input="updatePage" :color="paginationColor">
+                                        :total-visible="5" circle @input="updatePage" :color="paginationColor"
+                                        :style="{ 'max-width': '100%', 'width': '90%' }">
                                     </v-pagination>
                                 </v-col>
                             </v-row>
@@ -168,7 +170,7 @@
 
         .index-item {
             padding: 8px 12px;
-            margin: 0 4px;
+            margin: 4px;
             cursor: pointer;
             border-radius: 4px;
             background-color: #d0ece2;
@@ -273,6 +275,7 @@
                             return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText) || customer.phone.toLowerCase().includes(searchText);
                         });
                     }
+                    
                     this.page = 1; // Reset page to 1 when search text changes
                     this.activeIndex = -1; // Reset active index
                 },
