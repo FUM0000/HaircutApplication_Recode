@@ -51,24 +51,28 @@
                                         label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search"
                                         @click:clear="clearSearch"
                                         :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
-                                    <v-btn color="primary" @click="showAddCustomerDialog = true" class="ml-4">新規追加</v-btn>
+                                    <v-btn color="light-green lighten-3" @click="showAddCustomerDialog = true"
+                                        class="ml-4" :style="{ height: '48px' }">＋新規追加</v-btn>
                                 </v-col>
                             </v-row>
 
                             <v-dialog v-model="showAddCustomerDialog" max-width="400px" persistent>
-                                <v-card>
-                                    <v-card-title class="headline">新規顧客追加</v-card-title>
-                                    <v-card-text>
-                                        <v-text-field v-model="newCustomerName" label="氏名" required></v-text-field>
-                                        <v-text-field v-model="newCustomerNameKana" label="カタカナ"
-                                            required></v-text-field>
-                                        <v-text-field v-model="newCustomerPhone" label="電話番号" required></v-text-field>
+                                <v-card :style="{ backgroundColor: '#d8eedd', color: '#2c3e50' }">
+                                    <v-card-title class="headline mb-5">新規顧客追加</v-card-title>
+                                    <v-card-text style="padding-bottom: 0px;">
+                                        <v-text-field v-model="newCustomerName" label="氏名(必須)" required filled rounded
+                                            dense></v-text-field>
+                                        <v-text-field v-model="newCustomerNameKana" label="カタカナ(必須)" required filled
+                                            rounded dense></v-text-field>
+                                        <v-text-field v-model="newCustomerPhone" label="電話番号" required filled rounded
+                                            dense></v-text-field>
                                     </v-card-text>
-                                    <v-card-actions>
+                                    <v-card-actions style="padding-bottom: 20px;">
                                         <v-spacer></v-spacer>
-                                        <v-btn color="primary" :disabled="!newCustomerName || !newCustomerNameKana"
+                                        <v-btn color="light-green darken-1" text
+                                            :disabled="!newCustomerName || !newCustomerNameKana"
                                             @click="addCustomer">追加</v-btn>
-                                        <v-btn color="grey darken-1"
+                                        <v-btn color="grey darken-1" text
                                             @click="showAddCustomerDialog = false">キャンセル</v-btn>
                                     </v-card-actions>
                                 </v-card>
@@ -105,9 +109,10 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="customer in currentPageCustomers" :key="customer.id">
-                                                    <td>{{ customer.name }}</td>
-                                                    <td>{{ customer.phone }}</td>
+                                                <tr v-for="(customer, index) in currentPageCustomersWithEmptyRows"
+                                                    :key="index">
+                                                    <td>{{ customer.name || '' }}</td>
+                                                    <td>{{ customer.phone || '' }}</td>
                                                 </tr>
                                             </tbody>
                                         </template>
@@ -297,6 +302,11 @@
                     const endIndex = startIndex + 10;
                     return this.filteredCustomers.slice(startIndex, endIndex);
                 },
+                currentPageCustomersWithEmptyRows() {
+                    const customers = this.currentPageCustomers;
+                    const emptyRows = new Array(10 - customers.length).fill({});
+                    return [...customers, ...emptyRows];
+                }
             },
             methods: {
                 // System
