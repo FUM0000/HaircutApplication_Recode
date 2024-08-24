@@ -44,7 +44,8 @@
 
 
             <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
-            <main-system-bar :drawer="drawer" @change-drawer="Change_Drawer"><v-icon>mdi-cog</v-icon>設定</main-system-bar>
+            <main-system-bar :drawer="drawer"
+                @change-drawer="Change_Drawer"><v-icon>mdi-cog</v-icon>顧客情報</main-system-bar>
             <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
 
 
@@ -60,9 +61,15 @@
 
                     <transition name="fade-page">
                         <div v-show="show_page">
-
-
-
+                            <h1>顧客詳細</h1>
+                            <v-card v-if="customer">
+                                <v-card-title>{{ customer.name }}</v-card-title>
+                                <v-card-text>
+                                    <p>カタカナ: {{ customer.nameKana }}</p>
+                                    <p>電話番号: {{ customer.phone }}</p>
+                                </v-card-text>
+                            </v-card>
+                            <v-btn @click="goBack">戻る</v-btn>
                         </div>
                     </transition>
 
@@ -79,7 +86,6 @@
 
     <!-- ▼ Style ▼ ------------------------------------------------------------------------------------>
     <style>
-
         /* Fade */
         .fade-page-enter-active,
         .fade-page-leave-active {
@@ -119,16 +125,27 @@
             data: {
                 drawer: false,
                 show_page: false,
+
+                customer: null,
             },
             methods: {
                 // System
                 Change_Drawer(_value) {
                     this.drawer = _value;
                 },
+                goBack() {
+                    window.history.back();
+                },
             },
             mounted() {
                 $(window).ready(() => { this.show_page = true; });
-            }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const customerId = urlParams.get('id');
+                const customers = JSON.parse(localStorage.getItem('customers'));
+                this.customer = customers.find(c => c.id === parseInt(customerId));
+                console.log(this.customer);
+            },
         })
 
     </script>

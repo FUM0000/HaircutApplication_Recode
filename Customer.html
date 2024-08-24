@@ -32,8 +32,8 @@
     <v-app id="app">
         <template>
             <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
-            <main-system-bar :drawer="drawer" @change-drawer="Change_Drawer"><v-icon>mdi-account-circle</v-icon>
-                顧客一覧</main-system-bar>
+            <main-system-bar :drawer="drawer"
+                @change-drawer="Change_Drawer"><v-icon>mdi-account-circle</v-icon>顧客一覧</main-system-bar>
             <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
 
             <!-- ▼ Navigation ▼ ------------------------------------------------------------------------------->
@@ -111,7 +111,12 @@
                                             <tbody>
                                                 <tr v-for="(customer, index) in currentPageCustomersWithEmptyRows"
                                                     :key="index">
-                                                    <td>{{ customer.name || '' }}</td>
+                                                    <td>
+                                                        <a v-if="customer.id"
+                                                            :href="'./Customer_Infomation.html?id=' + customer.id">{{
+                                                            customer.name || '' }}</a>
+                                                        <span v-else>{{ customer.name || '' }}</span>
+                                                    </td>
                                                     <td>{{ customer.phone || '' }}</td>
                                                 </tr>
                                             </tbody>
@@ -265,9 +270,7 @@
             el: '#app',
             vuetify: new Vuetify(),
             data: {
-                // Determined
                 drawer: false,
-                // Myself
                 show_page: false,
 
                 searchText: '',
@@ -404,7 +407,10 @@
             mounted() {
                 $(window).ready(() => { this.show_page = true; });
                 this.filteredCustomers = this.customers;
-                this.sortCustomers(); // Call the sortCustomers method
+                this.sortCustomers();
+
+                // for Debug
+                localStorage.setItem('customers', JSON.stringify(this.customers));
             },
         });
     </script>
