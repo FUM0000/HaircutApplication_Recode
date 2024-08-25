@@ -45,6 +45,17 @@
                 <v-container id="main-container" class="d-flex flex-column" fluid fill-height>
                     <transition name="fade-page">
                         <div v-show="show_page" style="width: 100%;">
+
+                            <v-row style="margin-top: 30px">
+                                <v-col class="d-flex flex-wrap justify-center">
+                                    <v-btn @click="$refs.fileInput.click()"
+                                        class="custom-btn mx-2 my-2"><b>データをインポート</b></v-btn>
+                                    <input type="file" ref="fileInput" style="display: none" @change="importData"
+                                        accept=".json">
+                                    <v-btn @click="exportData" class="custom-btn mx-2 my-2"><b>データをエクスポート</b></v-btn>
+                                </v-col>
+                            </v-row>
+
                             <v-row>
                                 <v-col class="d-flex justify-center" style="margin-top: 25px">
                                     <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
@@ -109,7 +120,11 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(customer, index) in currentPageCustomersWithEmptyRows"
+                                                <tr v-if="customers.length === 0">
+                                                    <td colspan="2" class="text-center">データがありません。インポートしてください。</td>
+                                                </tr>
+                                                <tr v-if="customers.length !== 0"
+                                                    v-for="(customer, index) in currentPageCustomersWithEmptyRows"
                                                     :key="index">
                                                     <td>
                                                         <a v-if="customer.id"
@@ -156,6 +171,33 @@
             opacity: 0;
         }
 
+
+        /* Import, Export */
+        .custom-btn {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 5px solid #adff2f !important;
+            color: #606060 !important;
+            border-radius: 25px;
+            padding: 20px 30px !important;
+        }
+
+        .custom-btn {
+            width: 90%;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (min-width: 600px) {
+            .custom-btn {
+                width: auto;
+                max-width: none;
+            }
+        }
+
+
+        /* Search */
         .search-field>>>.v-input__prepend-outer {
             margin-right: 8px;
         }
@@ -168,6 +210,8 @@
             margin-left: 16px;
         }
 
+
+        /* Table */
         table {
             background-color: #e6f4ed;
             border-radius: 8px;
@@ -196,26 +240,6 @@
             white-space: nowrap;
         }
 
-        .index-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 16px 0;
-        }
-
-        .index-item {
-            padding: 8px 12px;
-            margin: 4px;
-            cursor: pointer;
-            border-radius: 4px;
-            background-color: #d0ece2;
-            color: #333;
-        }
-
-        .index-item.active {
-            background-color: #a0d0c0;
-            font-weight: 500;
-        }
-
         .v-pagination__item {
             min-width: 40px;
             height: 40px;
@@ -238,6 +262,28 @@
 
         .theme--light.v-pagination .v-pagination__navigation {
             background-color: #d0ece2;
+        }
+
+
+        /* Sort */
+        .index-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .index-item {
+            padding: 8px 12px;
+            margin: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            background-color: #d0ece2;
+            color: #333;
+        }
+
+        .index-item.active {
+            background-color: #a0d0c0;
+            font-weight: 500;
         }
 
         .sort.active {
@@ -275,17 +321,17 @@
 
                 searchText: '',
                 customers: [
-                    { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    { id: 2, name: '佐藤 花子', nameKana: 'サトウ ハナコ', phone: '080-9876-5432' },
-                    { id: 3, name: '鈴木 次郎', nameKana: 'スズキ ジロウ', phone: '070-5678-1234' },
-                    { id: 4, name: '田中 三郎', nameKana: 'タナカ サブロウ', phone: '060-1234-9876' },
-                    { id: 5, name: '山本 四郎', nameKana: 'ヤマモト シロウ', phone: '090-5678-1234' },
-                    { id: 6, name: '斎藤 五郎', nameKana: 'サイトウ ゴロウ', phone: '080-1234-5678' },
-                    { id: 7, name: '高橋 六郎', nameKana: 'タカハシ ロクロウ', phone: '070-9876-5432' },
-                    { id: 8, name: '伊藤 七郎', nameKana: 'イトウ シチロウ', phone: '060-5678-1234' },
-                    { id: 9, name: '中村 八郎', nameKana: 'ナカムラ ハチロウ', phone: '090-1234-9876' },
-                    { id: 10, name: '小林 九郎', nameKana: 'コバヤシ クロウ', phone: '080-5678-1234' },
-                    { id: 11, name: '渡辺 十郎', nameKana: 'ワタナベ ジュウロウ', phone: '070-1234-5678' },
+                    // { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
+                    // { id: 2, name: '佐藤 花子', nameKana: 'サトウ ハナコ', phone: '080-9876-5432' },
+                    // { id: 3, name: '鈴木 次郎', nameKana: 'スズキ ジロウ', phone: '070-5678-1234' },
+                    // { id: 4, name: '田中 三郎', nameKana: 'タナカ サブロウ', phone: '060-1234-9876' },
+                    // { id: 5, name: '山本 四郎', nameKana: 'ヤマモト シロウ', phone: '090-5678-1234' },
+                    // { id: 6, name: '斎藤 五郎', nameKana: 'サイトウ ゴロウ', phone: '080-1234-5678' },
+                    // { id: 7, name: '高橋 六郎', nameKana: 'タカハシ ロクロウ', phone: '070-9876-5432' },
+                    // { id: 8, name: '伊藤 七郎', nameKana: 'イトウ シチロウ', phone: '060-5678-1234' },
+                    // { id: 9, name: '中村 八郎', nameKana: 'ナカムラ ハチロウ', phone: '090-1234-9876' },
+                    // { id: 10, name: '小林 九郎', nameKana: 'コバヤシ クロウ', phone: '080-5678-1234' },
+                    // { id: 11, name: '渡辺 十郎', nameKana: 'ワタナベ ジュウロウ', phone: '070-1234-5678' },
                 ],
                 filteredCustomers: [],
                 page: 1,
@@ -317,6 +363,19 @@
                     this.drawer = _value;
                 },
 
+
+                saveToLocalStorage() {
+                    localStorage.setItem("CustomerData", JSON.stringify(this.customers));
+                },
+
+                loadFromLocalStorage() {
+                    const storedData = localStorage.getItem("CustomerData");
+                    if (storedData) {
+                        this.customers = JSON.parse(storedData);
+                    }
+                },
+
+
                 search() {
                     if (this.searchText.trim() === '') {
                         this.filteredCustomers = this.customers;
@@ -327,16 +386,16 @@
                         });
                     }
 
-                    this.sortCustomers(); // Call the sortCustomers method
-                    this.page = 1; // Reset page to 1 when search text changes
-                    this.activeIndex = -1; // Reset active index
+                    this.sortCustomers();
+                    this.page = 1;
+                    this.activeIndex = -1;
                 },
                 clearSearch() {
                     this.searchText = '';
                     this.filteredCustomers = this.customers;
-                    this.sortCustomers(); // Call the sortCustomers method
-                    this.page = 1; // Reset page to 1 when search is cleared
-                    this.activeIndex = -1; // Reset active index
+                    this.sortCustomers();
+                    this.page = 1;
+                    this.activeIndex = -1;
                 },
                 updatePage(page) {
                     this.page = page;
@@ -365,8 +424,8 @@
                         });
                         this.activeIndex = this.indexChars.indexOf(char);
                     }
-                    this.sortCustomers(); // Call the sortCustomers method
-                    this.page = 1; // Reset page to 1 when filtering by index
+                    this.sortCustomers();
+                    this.page = 1;
                 },
                 sortCustomers() {
                     this.filteredCustomers.sort((a, b) => {
@@ -403,14 +462,52 @@
                         this.showAddCustomerDialog = false;
                     }
                 },
+
+
+                exportData() {
+                    const dataToExport = { customers: this.customers };
+                    const dataStr = JSON.stringify(dataToExport, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                    const exportFileDefaultName = 'customers_data.json';
+
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                },
+                importData(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const importedData = JSON.parse(e.target.result);
+
+                                if (importedData && Array.isArray(importedData.customers)) {
+                                    this.customers = importedData.customers;
+                                    this.filteredCustomers = this.customers;
+                                    this.saveToLocalStorage();
+                                    this.sortCustomers();
+                                    this.page = 1;
+                                    this.activeIndex = -1;
+                                    alert('データのインポートに成功しました。');
+                                } else {
+                                    throw new Error('Invalid data format');
+                                }
+                            } catch (error) {
+                                console.error("Import error:", error);
+                                alert('データの読み込みに失敗しました。JSONファイルの形式を確認してください。');
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                }
             },
             mounted() {
-                $(window).ready(() => { this.show_page = true; });
+                this.loadFromLocalStorage();
                 this.filteredCustomers = this.customers;
                 this.sortCustomers();
-
-                // for Debug
-                localStorage.setItem('customers', JSON.stringify(this.customers));
+                $(window).ready(() => { this.show_page = true; });
             },
         });
     </script>

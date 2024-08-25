@@ -62,17 +62,16 @@
                     <transition name="fade-page">
                         <div v-show="show_page" style="width: 100%;">
 
-                            <v-row>
+                            <v-row style="margin-top: 50px">
                                 <v-col class="d-flex justify-center">
-                                    <!-- <v-btn @click="exportData">データをエクスポート (JSON)</v-btn> -->
-                                    <v-btn @click="$refs.fileInput.click()">データをインポート (JSON)</v-btn>
+                                    <v-btn @click="$refs.fileInput.click()" class="custom-btn"><b>データをインポート</b></v-btn>
                                     <input type="file" ref="fileInput" style="display: none" @change="importData"
                                         accept=".json">
                                 </v-col>
                             </v-row>
 
-                            <v-row>
-                                <v-col class="d-flex justify-center" style="margin-top: 100px">
+                            <v-row style="margin-top: 50px">
+                                <v-col class="d-flex justify-center">
                                     <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
                                         label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search"
                                         @click:clear="ClearSearch"
@@ -91,6 +90,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <tr v-if="customers.length === 0">
+                                                    <td colspan="2" class="text-center">データがありません。インポートしてください。</td>
+                                                </tr>
                                                 <tr v-for="customer in filteredCustomers" :key="customer.id">
                                                     <td>
                                                         <a v-if="customer.id"
@@ -134,7 +136,17 @@
         }
 
 
+        /* Import, Export */
+        .custom-btn {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 5px solid #adff2f !important;
+            color: #606060 !important;
+            border-radius: 25px;
+            padding: 20px 30px !important;
+        }
 
+
+        /* Search */
         .search-field>>>.v-input__prepend-outer {
             margin-right: 8px;
         }
@@ -148,6 +160,7 @@
         }
 
 
+        /* Table */
         table {
             background-color: #e6f4ed;
             border-radius: 8px;
@@ -217,6 +230,18 @@
                 },
 
 
+                saveToLocalStorage() {
+                    localStorage.setItem("CustomerData", JSON.stringify(this.customers));
+                },
+
+                loadFromLocalStorage() {
+                    const storedData = localStorage.getItem("CustomerData");
+                    if (storedData) {
+                        this.customers = JSON.parse(storedData);
+                    }
+                },
+
+
                 search() {
                     if (this.searchText.trim() === '') {
                         this.filteredCustomers = [];
@@ -233,17 +258,6 @@
                 },
 
 
-                // exportData() {
-                //     const dataToExport = { customers: this.customers };
-                //     const dataStr = JSON.stringify(dataToExport, null, 2);
-                //     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-                //     const exportFileDefaultName = 'customers_data.json';
-
-                //     const linkElement = document.createElement('a');
-                //     linkElement.setAttribute('href', dataUri);
-                //     linkElement.setAttribute('download', exportFileDefaultName);
-                //     linkElement.click();
-                // },
                 importData(event) {
                     const file = event.target.files[0];
                     if (file) {
@@ -254,6 +268,7 @@
 
                                 if (importedData && Array.isArray(importedData.customers)) {
                                     this.customers = importedData.customers;
+                                    this.saveToLocalStorage();
                                     alert('データのインポートに成功しました。');
                                 } else {
                                     throw new Error('Invalid data format');
@@ -266,9 +281,10 @@
                         reader.readAsText(file);
                         this.ClearSearch();
                     }
-                }
+                },
             },
             mounted() {
+                this.loadFromLocalStorage();
                 $(window).ready(() => { this.show_page = true; });
             }
         })
