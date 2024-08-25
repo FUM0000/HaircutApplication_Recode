@@ -63,7 +63,7 @@
                                         @click:clear="clearSearch"
                                         :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
                                     <v-btn color="light-green lighten-3" @click="showAddCustomerDialog = true"
-                                        class="ml-4" :style="{ height: '48px' }">＋新規追加</v-btn>
+                                        class="ml-4" :style="{ height: '48px', color: '#404040' }"><b>＋新規追加</b></v-btn>
                                 </v-col>
                             </v-row>
 
@@ -453,6 +453,7 @@
                             phone: this.newCustomerPhone,
                         });
                         this.filteredCustomers = this.customers;
+                        this.saveToLocalStorage();
                         this.sortCustomers();
                         this.page = 1;
                         this.activeIndex = -1;

@@ -45,7 +45,7 @@
 
             <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
             <main-system-bar :drawer="drawer"
-                @change-drawer="Change_Drawer"><v-icon>mdi-cog</v-icon>顧客情報</main-system-bar>
+                @change-drawer="Change_Drawer"><v-icon>mdi-account-circle</v-icon>顧客情報</main-system-bar>
             <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
 
 
@@ -61,15 +61,94 @@
 
                     <transition name="fade-page">
                         <div v-show="show_page">
-                            <h1>顧客詳細</h1>
-                            <v-card v-if="customer">
-                                <v-card-title>{{ customer.name }}</v-card-title>
-                                <v-card-text>
-                                    <p>カタカナ: {{ customer.nameKana }}</p>
-                                    <p>電話番号: {{ customer.phone }}</p>
-                                </v-card-text>
-                            </v-card>
-                            <v-btn @click="goBack">戻る</v-btn>
+
+                            <template v-if="customer">
+
+                                <v-card class="customer-card" v-if="customer">
+                                    <v-card-title class="headline">{{ customer.name }}</v-card-title>
+                                    <v-card-text>
+                                        <p><strong>カタカナ:</strong> {{ customer.nameKana }}</p>
+                                        <p><strong>電話番号:</strong> {{ customer.phone }}</p>
+                                    </v-card-text>
+                                </v-card>
+
+                                <v-card class="customer-card">
+                                    <v-card-title class="section-title">頭皮の状態</v-card-title>
+                                    <v-card-text>
+                                        <v-row>
+                                            <v-col cols="5">
+                                                <v-img src="path/to/scalp/image.jpg" aspect-ratio="1"
+                                                    class="scalp-image"></v-img>
+                                            </v-col>
+                                            <v-col cols="7">
+                                                <v-tabs v-model="activeTab" background-color="transparent" grow>
+                                                    <v-tab v-for="section in scalp_sections" :key="section">
+                                                        {{ section }}
+                                                    </v-tab>
+                                                </v-tabs>
+                                                <v-tabs-items v-model="activeTab">
+                                                    <v-tab-item v-for="section in scalp_sections" :key="section">
+                                                        <v-card flat>
+                                                            <v-card-text>
+                                                                <v-row align="center" v-for="(item, key) in scalpItems"
+                                                                    :key="key" class="status-item">
+                                                                    <v-col cols="3">
+                                                                        <v-radio-group
+                                                                            v-model="customer.scalp[0][scalp_sections_map[section]][0][key]"
+                                                                            row dense>
+                                                                            <v-radio label="良好" :value="1"></v-radio>
+                                                                            <v-radio label="中間" :value="2"></v-radio>
+                                                                            <v-radio label="注意" :value="3"></v-radio>
+                                                                        </v-radio-group>
+                                                                    </v-col>
+                                                                    <v-col cols="9">{{ item }}</v-col>
+                                                                </v-row>
+                                                            </v-card-text>
+                                                        </v-card>
+                                                    </v-tab-item>
+                                                </v-tabs-items>
+                                            </v-col>
+                                        </v-row>
+                                    </v-card-text>
+
+                                    <v-card-text>
+                                        <v-divider class="my-4"></v-divider>
+                                        <h3>備考</h3>
+                                        <div v-for="(item, key) in noteItems" :key="key" class="status-item">
+                                            <span>{{ item }}</span>
+                                            <v-radio-group v-model="customer.scalp[0].remarks[0][key]" row>
+                                                <v-radio label="有り" :value="true"></v-radio>
+                                                <v-radio label="無し" :value="false"></v-radio>
+                                            </v-radio-group>
+                                        </div>
+                                    </v-card-text>
+                                </v-card>
+
+                                <v-card class="customer-card">
+                                    <v-card-title class="section-title">毛髪の状態</v-card-title>
+                                    <v-card-text>
+                                        <div v-for="(item, key) in hairItems" :key="key" class="status-item">
+                                            <span>{{ item }}</span>
+                                            <v-radio-group v-model="customer.hair[0][key]" row>
+                                                <v-radio :label="hairLabels[key][1]" :value="1"></v-radio>
+                                                <v-radio :label="hairLabels[key][2]" :value="2"></v-radio>
+                                                <v-radio :label="hairLabels[key][3]" :value="3"></v-radio>
+                                            </v-radio-group>
+                                        </div>
+                                    </v-card-text>
+                                </v-card>
+
+                                <v-btn color="light-green lighten-3" class="ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="goBack"><b>戻る</b></v-btn>
+                            </template>
+                            <template v-else>
+                                <v-card>
+                                    <v-card-text>
+                                        顧客情報が見つかりません。
+                                    </v-card-text>
+                                </v-card>
+                            </template>
+
                         </div>
                     </transition>
 
@@ -95,6 +174,30 @@
         .fade-page-enter,
         .fade-page-leave-to {
             opacity: 0;
+        }
+
+        body {
+            background: rgb(216, 238, 221);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .customer-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            margin-bottom: 10px;
         }
     </style>
     <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
@@ -127,6 +230,45 @@
                 show_page: false,
 
                 customer: null,
+                activeTab: null,
+                scalp_sections: ['トップ', 'サイド', 'バック', 'ネープ'],
+                scalp_sections_map: {
+                    'トップ': 'top',
+                    'サイド': 'side',
+                    'バック': 'back',
+                    'ネープ': 'nape'
+                },
+                scalpItems: {
+                    redness: '赤み',
+                    keratin: '角質',
+                    dryness: '乾燥',
+                    oiliness: '油分',
+                    pores: '毛穴',
+                    hair_loss: '抜け毛',
+                    itching: 'かゆみ'
+                },
+                hairItems: {
+                    luster: 'ツヤ',
+                    thickness: '太さ',
+                    shape: '形状',
+                    hardness: '硬さ',
+                    elasticity: '弾力'
+                },
+                noteItems: {
+                    swelling: '腫れ',
+                    eczema: '湿疹',
+                    inflammation: '炎症',
+                    scars: '傷',
+                    atopic_dermatitis: 'アトピー性皮膚炎',
+                    pain: '痛み'
+                },
+                hairLabels: {
+                    luster: { 1: 'なし', 2: '普通', 3: 'あり' },
+                    thickness: { 1: '細い', 2: '普通', 3: '太い' },
+                    shape: { 1: '直毛', 2: 'やや癖毛', 3: '強い癖毛' },
+                    hardness: { 1: '柔らかい', 2: '普通', 3: '硬い' },
+                    elasticity: { 1: '弱い', 2: '普通', 3: '強い' }
+                },
             },
             methods: {
                 // System
@@ -136,17 +278,26 @@
                 goBack() {
                     window.history.back();
                 },
+                changeScalpStatus(section, key) {
+                    let englishSection = this.scalp_sections_map[section];
+                    let currentValue = this.customer.scalp[0][englishSection][0][key];
+                    this.customer.scalp[0][englishSection][0][key] = (currentValue % 3) + 1;
+                },
+                changeHairStatus(key) {
+                    let currentValue = this.customer.hair[0][key];
+                    this.customer.hair[0][key] = (currentValue % 3) + 1;
+                },
             },
             mounted() {
                 $(window).ready(() => { this.show_page = true; });
+
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const customerId = urlParams.get('id');
                 const customers = JSON.parse(localStorage.getItem("CustomerData"));
                 this.customer = customers.find(c => c.id === parseInt(customerId));
-                console.log(this.customer);
             },
-        })
+        });
 
     </script>
     <!-- ▲ Script Content ▲ --------------------------------------------------------------------------->

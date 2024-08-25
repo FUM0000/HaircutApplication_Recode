@@ -4,67 +4,80 @@
             "id": 1,
             "name": "山田 太郎",
             "nameKana": "ヤマダ タロウ",
-            "phone": "090-1234-5678"
-        },
-        {
-            "id": 2,
-            "name": "佐藤 花子",
-            "nameKana": "サトウ ハナコ",
-            "phone": "080-9876-5432"
-        },
-        {
-            "id": 3,
-            "name": "鈴木 次郎",
-            "nameKana": "スズキ ジロウ",
-            "phone": "070-5678-1234"
-        },
-        {
-            "id": 4,
-            "name": "田中 三郎",
-            "nameKana": "タナカ サブロウ",
-            "phone": "060-1234-9876"
-        },
-        {
-            "id": 5,
-            "name": "山本 四郎",
-            "nameKana": "ヤマモト シロウ",
-            "phone": "090-5678-1234"
-        },
-        {
-            "id": 6,
-            "name": "斎藤 五郎",
-            "nameKana": "サイトウ ゴロウ",
-            "phone": "080-1234-5678"
-        },
-        {
-            "id": 7,
-            "name": "高橋 六郎",
-            "nameKana": "タカハシ ロクロウ",
-            "phone": "070-9876-5432"
-        },
-        {
-            "id": 8,
-            "name": "伊藤 七郎",
-            "nameKana": "イトウ シチロウ",
-            "phone": "060-5678-1234"
-        },
-        {
-            "id": 9,
-            "name": "中村 八郎",
-            "nameKana": "ナカムラ ハチロウ",
-            "phone": "090-1234-9876"
-        },
-        {
-            "id": 10,
-            "name": "小林 九郎",
-            "nameKana": "コバヤシ クロウ",
-            "phone": "080-5678-1234"
-        },
-        {
-            "id": 11,
-            "name": "渡辺 十郎",
-            "nameKana": "ワタナベ ジュウロウ",
-            "phone": "070-1234-5678"
+            "phone": "090-1234-5678",
+            "birthday": "1996/01/01",
+            "data": [
+                {
+                    "date": "2024/08/26",
+                    "scalp": [
+                        {
+                            "top": [
+                                {
+                                    "redness": 1,
+                                    "keratin": 1,
+                                    "dryness": 1,
+                                    "oiliness": 1,
+                                    "pores": 1,
+                                    "hair_loss": 1,
+                                    "itching": 1
+                                }
+                            ],
+                            "side": [
+                                {
+                                    "redness": 2,
+                                    "keratin": 2,
+                                    "dryness": 2,
+                                    "oiliness": 2,
+                                    "pores": 2,
+                                    "hair_loss": 2,
+                                    "itching": 2
+                                }
+                            ],
+                            "back": [
+                                {
+                                    "redness": 3,
+                                    "keratin": 3,
+                                    "dryness": 3,
+                                    "oiliness": 3,
+                                    "pores": 3,
+                                    "hair_loss": 3,
+                                    "itching": 3
+                                }
+                            ],
+                            "nape": [
+                                {
+                                    "redness": 2,
+                                    "keratin": 2,
+                                    "dryness": 2,
+                                    "oiliness": 2,
+                                    "pores": 2,
+                                    "hair_loss": 2,
+                                    "itching": 2
+                                }
+                            ],
+                            "remarks": [
+                                {
+                                    "swelling": false,
+                                    "eczema": false,
+                                    "inflammation": false,
+                                    "scars": false,
+                                    "atopic_dermatitis": false,
+                                    "pain": false
+                                }
+                            ]
+                        }
+                    ],
+                    "hair": [
+                        {
+                            "luster": 1,
+                            "thickness": 2,
+                            "shape": 3,
+                            "hardness": 2,
+                            "elasticity": 2
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
