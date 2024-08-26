@@ -81,7 +81,7 @@
                                             <v-col><strong>電話番号:</strong> {{ customer.phone }}</v-col>
                                         </v-row>
                                         <v-textarea class="mt-8" outlined name="input-7-4" label="コメント"
-                                            value=customer.comment></v-textarea>
+                                            v-model="customer.comment"></v-textarea>
                                     </v-card-text>
                                 </v-card>
 
@@ -105,42 +105,33 @@
                                                 </v-tabs>
                                                 <v-tabs-items v-model="activeTab">
                                                     <v-tab-item v-for="section in scalp_sections" :key="section">
-                                                        <v-img src="./Asset/Image/Test_1.png" aspect-ratio="1"
+                                                        <v-img :src="getImageSrc()" aspect-ratio="1"
                                                             class="scalp-image"></v-img>
                                                         <v-card flat>
                                                             <v-card-text>
                                                                 <v-card-text>
-                                                                    <v-row class="status-item mt-4 mb-4">
-                                                                        <v-col cols="3"
-                                                                            style="padding-top: 0; padding-bottom: 0;"></v-col>
-                                                                        <v-col class="d-flex justify-center"
-                                                                            style="padding-top: 0; padding-bottom: 0;">良好</v-col>
-                                                                        <v-col class="d-flex justify-center"
-                                                                            style="padding-top: 0; padding-bottom: 0;">普通</v-col>
-                                                                        <v-col class="d-flex justify-center"
-                                                                            style="padding-top: 0; padding-bottom: 0;">注意</v-col>
+                                                                    <v-row class="status-item mt-10 mb-4">
+                                                                        <v-col cols="3" class="col-radio"></v-col>
+                                                                        <v-col class="col-radio">良好</v-col>
+                                                                        <v-col class="col-radio">普通</v-col>
+                                                                        <v-col class="col-radio">注意</v-col>
                                                                     </v-row>
                                                                     <v-row align="center"
                                                                         v-for="(item, key) in scalpItems" :key="key"
                                                                         style="margin-top: 0;">
-                                                                        <v-col cols="3" class="d-flex justify-center"
-                                                                            style="padding-top: 0; padding-bottom: 0;"><b>{{
+                                                                        <v-col cols="3" class="col-radio"><b>{{
                                                                                 item }}</b></v-col>
-                                                                        <v-col
-                                                                            style="padding-top: 0; padding-bottom: 0;">
+                                                                        <v-col style="margin: 0; padding: 0;">
                                                                             <v-radio-group
                                                                                 v-model="selectedData.scalp[0][scalp_sections_map[section]][0][key]"
                                                                                 row>
-                                                                                <v-col
-                                                                                    style="padding-top: 0; padding-bottom: 0;"><v-radio
+                                                                                <v-col class="col-radio"><v-radio
                                                                                         class="custom-radio"
                                                                                         :value="1"></v-radio></v-col>
-                                                                                <v-col
-                                                                                    style="padding-top: 0; padding-bottom: 0;"><v-radio
+                                                                                <v-col class="col-radio"><v-radio
                                                                                         class="custom-radio"
                                                                                         :value="2"></v-radio></v-col>
-                                                                                <v-col
-                                                                                    style="padding-top: 0; padding-bottom: 0;"><v-radio
+                                                                                <v-col class="col-radio"><v-radio
                                                                                         class="custom-radio"
                                                                                         :value="3"></v-radio></v-col>
                                                                             </v-radio-group>
@@ -158,26 +149,21 @@
                                         <v-card class="customer-card">
                                             <v-card-title class="section-title">備考</v-card-title>
                                             <v-card-text>
-                                                <v-row class="status-item mt-4 mb-4">
-                                                    <v-col cols="4" style="padding-top: 0; padding-bottom: 0;"></v-col>
-                                                    <v-col class="d-flex justify-center"
-                                                        style="padding-top: 0; padding-bottom: 0;">なし</v-col>
-                                                    <v-col class="d-flex justify-center"
-                                                        style="padding-top: 0; padding-bottom: 0;">あり</v-col>
+                                                <v-row class="status-item mt-10 mb-4">
+                                                    <v-col cols="4" class="col-radio"></v-col>
+                                                    <v-col class="col-radio">なし</v-col>
+                                                    <v-col class="col-radio">あり</v-col>
                                                 </v-row>
                                                 <v-row align="center" v-for="(item, key) in noteItems" :key="key"
                                                     style="margin-top: 0;">
-                                                    <v-col cols="4" class="d-flex justify-center"
-                                                        style="padding-top: 0; padding-bottom: 0;"><b>{{ item
+                                                    <v-col cols="4" class="col-radio"><b>{{ item
                                                             }}</b></v-col>
-                                                    <v-col style="padding-top: 0; padding-bottom: 0;">
+                                                    <v-col style="margin: 0; padding: 0;">
                                                         <v-radio-group v-model="selectedData.scalp[0].remarks[0][key]"
                                                             row>
-                                                            <v-col style="padding-top: 0; padding-bottom: 0;"><v-radio
-                                                                    :value="false"
+                                                            <v-col class="col-radio"><v-radio :value="false"
                                                                     class="custom-radio"></v-radio></v-col>
-                                                            <v-col style="padding-top: 0; padding-bottom: 0;"><v-radio
-                                                                    :value="true"
+                                                            <v-col class="col-radio"><v-radio :value="true"
                                                                     class="custom-radio"></v-radio></v-col>
                                                         </v-radio-group>
                                                     </v-col>
@@ -191,19 +177,20 @@
                                     <v-card-text>
                                         <v-card class="customer-card">
                                             <v-card-title class="section-title">毛髪の状態</v-card-title>
-                                            <v-card-text>
+                                            <v-card-text class="mt-10">
                                                 <v-row v-for="(item, key) in hairItems" :key="key"
-                                                    class="status-item d-flex flex-column mt-4">
-                                                    <span class="ml-4">{{ item }}</span>
-                                                    <v-col>
-                                                        <v-radio-group v-model="selectedData.hair[0][key]" row>
-                                                            <v-col><v-radio class="custom-radio"
+                                                    class="d-flex flex-column">
+                                                    <span class="status-item ml-4">{{ item }}</span>
+                                                    <v-col style="padding-top: 0; padding-bottom: 0;">
+                                                        <v-radio-group v-model="selectedData.hair[0][key]" row
+                                                            style="margin-top: 0;">
+                                                            <v-col class="col-radio"><v-radio class="custom-radio"
                                                                     :label="hairLabels[key][1]"
                                                                     :value="1"></v-radio></v-col>
-                                                            <v-col><v-radio class="custom-radio"
+                                                            <v-col class="col-radio"><v-radio class="custom-radio"
                                                                     :label="hairLabels[key][2]"
                                                                     :value="2"></v-radio></v-col>
-                                                            <v-col><v-radio class="custom-radio"
+                                                            <v-col class="col-radio"><v-radio class="custom-radio"
                                                                     :label="hairLabels[key][3]"
                                                                     :value="3"></v-radio></v-col>
                                                         </v-radio-group>
@@ -274,8 +261,28 @@
             font-weight: bold;
         }
 
+        .col-radio {
+            display: flex;
+            justify-content: center;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .custom-radio {
+            display: flex;
+            justify-content: center;
+        }
+
         .custom-radio .v-icon {
             color: #4CAF50 !important;
+        }
+
+        .v-application--is-ltr .v-input--selection-controls__input {
+            margin: 0;
+        }
+
+        .v-input--radio-group.v-input--radio-group--row .v-radio {
+            margin: 0 !important;
         }
 
         .date-select .v-select__selections {
@@ -390,6 +397,26 @@
                         age--;
                     }
                     return age;
+                },
+
+                getImageSrc() {
+                    if (!this.customer || !this.selectedData || this.activeTab === null) {
+                        return '';
+                    }
+
+                    const customerName = this.customer.name;
+                    const examDate = this.formatDate(this.selectedData.date);
+                    const activeSection = this.scalp_sections[this.activeTab];
+
+                    return `./Asset/Image/${customerName}_${examDate}_${activeSection}.png`;
+                },
+
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}${month}${day}`;
                 }
             },
             mounted() {
