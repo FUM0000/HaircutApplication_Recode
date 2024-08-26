@@ -4,8 +4,10 @@
             "id": 1,
             "name": "山田 太郎",
             "nameKana": "ヤマダ タロウ",
-            "phone": "090-1234-5678",
+            "sex": "男",
             "birthday": "1996/01/01",
+            "phone": "090-1234-5678",
+            "comment": "no comment",
             "data": [
                 {
                     "date": "2024/08/26",
