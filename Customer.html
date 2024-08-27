@@ -71,20 +71,41 @@
                                 <v-card :style="{ backgroundColor: '#d8eedd', color: '#2c3e50' }">
                                     <v-card-title class="headline mb-5">新規顧客追加</v-card-title>
                                     <v-card-text style="padding-bottom: 0px;">
-                                        <v-text-field v-model="newCustomerName" label="氏名(必須)" required filled rounded
-                                            dense></v-text-field>
-                                        <v-text-field v-model="newCustomerNameKana" label="カタカナ(必須)" required filled
-                                            rounded dense></v-text-field>
-                                        <v-text-field v-model="newCustomerPhone" label="電話番号" required filled rounded
-                                            dense></v-text-field>
+                                        <v-row>
+                                            <v-text-field v-model="newCustomerName" label="氏名(必須)" required filled
+                                                rounded dense></v-text-field>
+                                        </v-row>
+                                        <v-row>
+                                            <v-text-field v-model="newCustomerNameKana" label="カタカナ(必須)" required filled
+                                                rounded dense></v-text-field>
+                                            <v-select v-model="newSex" :items="['男', '女', 'その他']" label="性別" required
+                                                filled rounded dense></v-select>
+                                        </v-row>
+                                        <v-row>
+                                            <v-menu v-model="birthdayMenu" :close-on-content-click="false"
+                                                transition="scale-transition" offset-y max-width="290px"
+                                                min-width="290px">
+                                                <template v-slot:activator="{ on, attrs }">
+                                                    <v-text-field v-model="newBirthday" label="生年月日" type="date"
+                                                        required filled rounded dense v-bind="attrs"
+                                                        v-on="on"></v-text-field>
+                                                </template>
+                                                <v-date-picker v-model="newBirthday" @input="birthdayMenu = false"
+                                                    locale="ja-jp" :day-format="date => new Date(date).getDate()"
+                                                    :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"></v-date-picker>
+                                            </v-menu>
+                                        </v-row>
+                                        <v-row>
+                                            <v-text-field v-model="newCustomerPhone" label="電話番号" required filled
+                                                rounded dense></v-text-field>
+                                        </v-row>
                                     </v-card-text>
                                     <v-card-actions style="padding-bottom: 20px;">
                                         <v-spacer></v-spacer>
                                         <v-btn color="light-green darken-1" text
                                             :disabled="!newCustomerName || !newCustomerNameKana"
                                             @click="addCustomer">追加</v-btn>
-                                        <v-btn color="grey darken-1" text
-                                            @click="showAddCustomerDialog = false">キャンセル</v-btn>
+                                        <v-btn color="grey darken-1" text @click="Cancel">キャンセル</v-btn>
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>
@@ -300,6 +321,7 @@
     <!-- Main -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/lang/ja.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vector-js@4.1.1/dist/vector.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
@@ -314,7 +336,12 @@
         // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
-            vuetify: new Vuetify(),
+            vuetify: new Vuetify({
+                lang: {
+                    locales: { ja: "ja" },
+                    current: 'ja',
+                },
+            }),
             data: {
                 drawer: false,
                 show_page: false,
@@ -344,6 +371,8 @@
                 newCustomerName: '',
                 newCustomerNameKana: '',
                 newCustomerPhone: '',
+
+                birthdayMenu: false,
             },
             computed: {
                 currentPageCustomers() {
@@ -444,24 +473,60 @@
                     this.sortCustomers();
                 },
 
+
                 addCustomer() {
                     if (this.newCustomerName && this.newCustomerNameKana) {
+
+                        let newId = 1;
+                        const usedIds = new Set(this.customers.map(c => c.id));
+                        while (usedIds.has(newId)) {
+                            newId++;
+                        }
                         this.customers.push({
-                            id: this.customers.length + 1,
+                            id: newId,
                             name: this.newCustomerName,
                             nameKana: this.newCustomerNameKana,
+                            sex: this.newSex,
+                            birthday: this.newBirthday,
                             phone: this.newCustomerPhone,
+                            comment: "",
+                            data: []
                         });
                         this.filteredCustomers = this.customers;
                         this.saveToLocalStorage();
                         this.sortCustomers();
+
+                        // Export
+                        let dataStr = JSON.stringify(this.customers, null, 2);
+                        let dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                        let exportFileDefaultName = 'all_customers_data.json';
+                        let linkElement = document.createElement('a');
+                        linkElement.setAttribute('href', dataUri);
+                        linkElement.setAttribute('download', exportFileDefaultName);
+                        linkElement.click();
+
                         this.page = 1;
                         this.activeIndex = -1;
-                        this.newCustomerName = '';
-                        this.newCustomerNameKana = '';
-                        this.newCustomerPhone = '';
+                        this.newCustomerName = null;
+                        this.newCustomerNameKana = null;
+                        this.newSex = null;
+                        this.newBirthday = null;
+                        this.newCustomerPhone = null;
                         this.showAddCustomerDialog = false;
+
+                        this.showAddCustomerDialog = false;
+
+                        alert('新規追加され、顧客情報がエクスポートされました。');
                     }
+                },
+                Cancel() {
+                    this.newCustomerName = null;
+                    this.newCustomerNameKana = null;
+                    this.newSex = null;
+                    this.newBirthday = null;
+                    this.newCustomerPhone = null;
+
+                    this.showAddCustomerDialog = false;
                 },
 
 

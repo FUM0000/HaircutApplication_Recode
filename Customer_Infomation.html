@@ -65,8 +65,29 @@
                             <template v-if="customer">
                                 <v-btn color="light-green lighten-3" class="mb-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="toggleEditMode">
-                                    <b>{{ editMode ? '編集を終了' : '編集' }}</b>
+                                    <b>{{ editMode ? '編集を破棄' : '編集' }}</b>
                                 </v-btn>
+
+                                <v-btn v-if="editMode" color="light-green lighten-3" class="mb-4 ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="openDatePicker">
+                                    <b>＋新しい診断日を追加</b>
+                                </v-btn>
+                                <v-dialog v-model="showDatePicker" max-width="290px">
+                                    <v-card>
+                                        <v-card-title class="headline">診断日を選択</v-card-title>
+                                        <v-card-text>
+                                            <v-date-picker v-model="newExamDate" full-width locale="ja-jp"
+                                                :day-format="date => new Date(date).getDate()"
+                                                :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"></v-date-picker>
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn color="blue darken-1" text
+                                                @click="showDatePicker = false">キャンセル</v-btn>
+                                            <v-btn color="blue darken-1" text @click="addNewExamDate">追加</v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-dialog>
 
                                 <v-btn v-if="editMode" color="light-green lighten-3" class="mb-4 ml-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="saveChanges">
@@ -76,32 +97,71 @@
 
                                 <v-card class="customer-card">
                                     <v-card-title class="section-title d-flex">基本情報</v-card-title>
-                                    <v-card-title class="headline">{{ customer.name }}</v-card-title>
                                     <v-card-text>
                                         <v-row>
-                                            <v-col><strong>カタカナ:</strong> {{ customer.nameKana }}</v-col>
-                                            <v-col><strong>性別:</strong> {{ customer.sex }}</v-col>
+                                            <v-col>
+                                                <v-text-field v-model="customer.name" label="名前" :readonly="!editMode"
+                                                    :class="{ 'edited': editMode && customer.name !== originalCustomer.name }"></v-text-field>
+                                            </v-col>
                                         </v-row>
                                         <v-row>
-                                            <v-col><strong>生年月日:</strong> {{ customer.birthday }}</v-col>
-                                            <v-col><strong>年齢:</strong> {{ calculateAge(customer.birthday) }}歳</v-col>
+                                            <v-col>
+                                                <v-text-field v-model="customer.nameKana" label="カタカナ"
+                                                    :readonly="!editMode"
+                                                    :class="{ 'edited': editMode && customer.nameKana !== originalCustomer.nameKana }"></v-text-field>
+                                            </v-col>
+                                            <v-col>
+                                                <v-select v-model="customer.sex" :items="['男', '女', 'その他']" label="性別"
+                                                    :readonly="!editMode"
+                                                    :class="{ 'edited': editMode && customer.sex !== originalCustomer.sex }"></v-select>
+                                            </v-col>
                                         </v-row>
                                         <v-row>
-                                            <v-col><strong>電話番号:</strong> {{ customer.phone }}</v-col>
+                                            <v-col>
+                                                <v-menu v-model="birthdayMenu" :close-on-content-click="false"
+                                                    transition="scale-transition" offset-y max-width="290px"
+                                                    min-width="290px">
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-text-field v-model="customer.birthday" label="生年月日" readonly
+                                                            v-bind="attrs" v-on="on"
+                                                            :class="{ 'edited': editMode && customer.birthday !== originalCustomer.birthday }"></v-text-field>
+                                                    </template>
+                                                    <v-date-picker v-model="customer.birthday"
+                                                        @input="birthdayMenu = false" :readonly="!editMode"
+                                                        locale="ja-jp" :day-format="date => new Date(date).getDate()"
+                                                        :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"></v-date-picker>
+                                                </v-menu>
+                                            </v-col>
+                                            <v-col>
+                                                <v-text-field :value="calculateAge(customer.birthday)" label="年齢"
+                                                    readonly suffix="歳"></v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row>
+                                            <v-col>
+                                                <v-text-field v-model="customer.phone" label="電話番号"
+                                                    :readonly="!editMode"
+                                                    :class="{ 'edited': editMode && customer.phone !== originalCustomer.phone }"></v-text-field>
+                                            </v-col>
                                         </v-row>
                                         <v-textarea class="mt-8" outlined name="input-7-4" label="コメント"
-                                            v-model="customer.comment"></v-textarea>
+                                            v-model="customer.comment" :readonly="!editMode"
+                                            :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }"></v-textarea>
                                     </v-card-text>
                                 </v-card>
 
 
-                                <v-card class="customer-card" v-if="selectedData">
+                                <v-card class="customer-card" v-if="customer.data.length > 0">
                                     <v-card-title class="section-title d-flex align-center">
                                         <span class="white--text">診断日:</span>
                                         <v-select v-model="selectedDataIndex"
                                             :items="customer.data.map((d, index) => ({ text: d.date, value: index }))"
                                             class="ml-4 date-select"
                                             style="max-width: 150px; padding-top: 20px;"></v-select>
+                                        <v-spacer></v-spacer>
+                                        <v-btn v-if="editMode" color="error" @click="deleteExamDate(selectedDataIndex)">
+                                            診断データを削除
+                                        </v-btn>
                                     </v-card-title>
                                     <v-card-text>
                                         <v-card class="customer-card">
@@ -133,7 +193,8 @@
                                                                         <v-col style="margin: 0; padding: 0;">
                                                                             <v-radio-group
                                                                                 v-model="selectedData.scalp[0][scalp_sections_map[section]][0][key]"
-                                                                                row>
+                                                                                row :disabled="!editMode"
+                                                                                :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }">
                                                                                 <v-col class="col-radio"><v-radio
                                                                                         class="custom-radio"
                                                                                         :value="1"></v-radio></v-col>
@@ -169,7 +230,8 @@
                                                             }}</b></v-col>
                                                     <v-col style="margin: 0; padding: 0;">
                                                         <v-radio-group v-model="selectedData.scalp[0].remarks[0][key]"
-                                                            row>
+                                                            row :disabled="!editMode"
+                                                            :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }">
                                                             <v-col class="col-radio"><v-radio :value="false"
                                                                     class="custom-radio"></v-radio></v-col>
                                                             <v-col class="col-radio"><v-radio :value="true"
@@ -192,7 +254,8 @@
                                                     <span class="status-item ml-4">{{ item }}</span>
                                                     <v-col style="padding-top: 0; padding-bottom: 0;">
                                                         <v-radio-group v-model="selectedData.hair[0][key]" row
-                                                            style="margin-top: 0;">
+                                                            style="margin-top: 0;" :disabled="!editMode"
+                                                            :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }">
                                                             <v-col class="col-radio"><v-radio class="custom-radio"
                                                                     :label="hairLabels[key][1]"
                                                                     :value="1"></v-radio></v-col>
@@ -207,6 +270,11 @@
                                                 </v-row>
                                             </v-card-text>
                                         </v-card>
+                                    </v-card-text>
+                                </v-card>
+                                <v-card v-else class="customer-card">
+                                    <v-card-text>
+                                        診断データがありません。新しい診断を追加してください。
                                     </v-card-text>
                                 </v-card>
 
@@ -247,11 +315,6 @@
         .fade-page-enter,
         .fade-page-leave-to {
             opacity: 0;
-        }
-
-        body {
-            background: rgb(216, 238, 221);
-            font-family: 'Roboto', sans-serif;
         }
 
         .customer-card {
@@ -304,7 +367,7 @@
 
 
         .edited {
-            background-color: #FFFF99 !important;
+            background-color: rgba(216, 238, 221, 0.3) !important;
         }
     </style>
     <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
@@ -314,6 +377,7 @@
     <!-- Main -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/lang/ja.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vector-js@4.1.1/dist/vector.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
@@ -331,7 +395,12 @@
         // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
-            vuetify: new Vuetify(),
+            vuetify: new Vuetify({
+                lang: {
+                    locales: { ja: "ja" },
+                    current: 'ja',
+                },
+            }),
             data: {
                 drawer: false,
                 show_page: false,
@@ -379,6 +448,11 @@
 
                 editMode: false,
                 originalCustomer: null,
+
+                newExamDate: null,
+                showDatePicker: false,
+
+                birthdayMenu: false,
             },
             computed: {
                 selectedData() {
@@ -386,7 +460,6 @@
                         ? this.customer.data[this.selectedDataIndex]
                         : null;
                 },
-
                 isDataEdited() {
                     return JSON.stringify(this.customer) !== JSON.stringify(this.originalCustomer);
                 },
@@ -439,6 +512,7 @@
                     const day = String(date.getDate()).padStart(2, '0');
                     return `${year}${month}${day}`;
                 },
+
                 toggleEditMode() {
                     if (this.editMode) {
                         if (this.isDataEdited) {
@@ -449,36 +523,50 @@
                             }
                         }
                     } else {
-                        this.originalCustomer = this.customer;
+                        this.originalCustomer = JSON.parse(JSON.stringify(this.customer));
                     }
                     this.editMode = !this.editMode;
                 },
 
                 saveChanges() {
-                    let customers = JSON.parse(localStorage.getItem("CustomerData"));
+                    if (this.isDataEdited) {
 
-                    let index = customers.findIndex(c => c.id === this.customer.id);
-                    customers[index] = this.customer;
-                    localStorage.setItem("CustomerData", JSON.stringify(customers));
+                        let customers = JSON.parse(localStorage.getItem("CustomerData"));
 
-                    // Export
-                    let dataStr = JSON.stringify(customers, null, 2);
-                    let dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-                    let exportFileDefaultName = 'all_customers_data.json';
-                    let linkElement = document.createElement('a');
-                    linkElement.setAttribute('href', dataUri);
-                    linkElement.setAttribute('download', exportFileDefaultName);
-                    linkElement.click();
+                        let index = customers.findIndex(c => c.id === this.customer.id);
+                        customers[index] = this.customer;
+                        localStorage.setItem("CustomerData", JSON.stringify(customers));
 
-                    this.editMode = false;
-                    this.originalCustomer = JSON.parse(JSON.stringify(this.customer));
-                    alert('変更が保存され、顧客情報がエクスポートされました。');
+                        // Export
+                        let dataStr = JSON.stringify(customers, null, 2);
+                        let dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                        let exportFileDefaultName = 'all_customers_data.json';
+                        let linkElement = document.createElement('a');
+                        linkElement.setAttribute('href', dataUri);
+                        linkElement.setAttribute('download', exportFileDefaultName);
+                        linkElement.click();
+
+                        this.editMode = false;
+                        this.originalCustomer = JSON.parse(JSON.stringify(this.customer));
+                        alert('変更が保存され、顧客情報がエクスポートされました。');
+                    }
                 },
 
                 addNewExamDate() {
-                    const newDate = new Date().toISOString().split('T')[0];
+                    if (!this.newExamDate) {
+                        alert('診断日を選択してください。');
+                        return;
+                    }
+
+                    const formattedDate = new Date(this.newExamDate).toISOString().split('T')[0];
+
+                    if (this.customer.data.some(d => d.date === formattedDate)) {
+                        alert('この日付の診断データは既に存在します。');
+                        return;
+                    }
+
                     const newData = {
-                        date: newDate,
+                        date: formattedDate,
                         scalp: [
                             {
                                 top: [{}],
@@ -491,9 +579,9 @@
                         hair: [{}]
                     };
 
-                    // 各セクションの初期値を設定
                     for (let section in this.scalp_sections_map) {
                         let englishSection = this.scalp_sections_map[section];
+                        newData.scalp[0][englishSection][0] = {};
                         for (let item in this.scalpItems) {
                             newData.scalp[0][englishSection][0][item] = 1;
                         }
@@ -507,8 +595,26 @@
                         newData.hair[0][item] = 1;
                     }
 
+
                     this.customer.data.push(newData);
-                    this.selectedDataIndex = this.customer.data.length - 1;
+                    this.customer.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    this.selectedDataIndex = this.customer.data.findIndex(d => d.date === formattedDate);
+                    this.showDatePicker = false;
+                    this.newExamDate = null;
+                },
+                deleteExamDate(index) {
+                    if (confirm('この診断データを削除してもよろしいですか？')) {
+                        this.customer.data.splice(index, 1);
+                        if (this.customer.data.length > 0) {
+                            this.selectedDataIndex = this.customer.data.length - 1;
+                        } else {
+                            this.selectedDataIndex = null;
+                        }
+                    }
+                },
+
+                openDatePicker() {
+                    this.showDatePicker = true;
                 },
             },
             mounted() {
@@ -519,9 +625,11 @@
                 const customers = JSON.parse(localStorage.getItem("CustomerData"));
                 this.customer = customers.find(c => c.id === parseInt(customerId));
 
-                if (this.customer && this.customer.data.length > 0) {
-                    this.selectedDataIndex = this.customer.data.length - 1;
+                if (!this.customer) {
+                    console.error('Customer not found');
+                    return;
                 }
+                this.selectedDataIndex = this.customer.data.length > 0 ? this.customer.data.length - 1 : null;
             },
         });
 
