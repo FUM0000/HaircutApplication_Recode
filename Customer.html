@@ -465,17 +465,6 @@
                 },
 
 
-                exportData() {
-                    const dataToExport = { customers: this.customers };
-                    const dataStr = JSON.stringify(dataToExport, null, 2);
-                    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-                    const exportFileDefaultName = 'customers_data.json';
-
-                    const linkElement = document.createElement('a');
-                    linkElement.setAttribute('href', dataUri);
-                    linkElement.setAttribute('download', exportFileDefaultName);
-                    linkElement.click();
-                },
                 importData(event) {
                     const file = event.target.files[0];
                     if (file) {
@@ -484,8 +473,8 @@
                             try {
                                 const importedData = JSON.parse(e.target.result);
 
-                                if (importedData && Array.isArray(importedData.customers)) {
-                                    this.customers = importedData.customers;
+                                if (importedData && Array.isArray(importedData)) {
+                                    this.customers = importedData;
                                     this.filteredCustomers = this.customers;
                                     this.saveToLocalStorage();
                                     this.sortCustomers();
@@ -502,7 +491,18 @@
                         };
                         reader.readAsText(file);
                     }
-                }
+                },
+                exportData() {
+                    const dataToExport = this.customers;
+                    const dataStr = JSON.stringify(dataToExport, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                    const exportFileDefaultName = 'customers_data.json';
+
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                },
             },
             mounted() {
                 this.loadFromLocalStorage();

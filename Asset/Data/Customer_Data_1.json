@@ -1,85 +1,83 @@
-{
-    "customers": [
-        {
-            "id": 1,
-            "name": "山田 太郎",
-            "nameKana": "ヤマダ タロウ",
-            "sex": "男",
-            "birthday": "1996/01/01",
-            "phone": "090-1234-5678",
-            "comment": "ノーコメント",
-            "data": [
-                {
-                    "date": "2024/08/26",
-                    "scalp": [
-                        {
-                            "top": [
-                                {
-                                    "redness": 1,
-                                    "keratin": 1,
-                                    "dryness": 1,
-                                    "oiliness": 1,
-                                    "pores": 1,
-                                    "hair_loss": 1,
-                                    "itching": 1
-                                }
-                            ],
-                            "side": [
-                                {
-                                    "redness": 2,
-                                    "keratin": 2,
-                                    "dryness": 2,
-                                    "oiliness": 2,
-                                    "pores": 2,
-                                    "hair_loss": 2,
-                                    "itching": 2
-                                }
-                            ],
-                            "back": [
-                                {
-                                    "redness": 3,
-                                    "keratin": 3,
-                                    "dryness": 3,
-                                    "oiliness": 3,
-                                    "pores": 3,
-                                    "hair_loss": 3,
-                                    "itching": 3
-                                }
-                            ],
-                            "nape": [
-                                {
-                                    "redness": 2,
-                                    "keratin": 2,
-                                    "dryness": 2,
-                                    "oiliness": 2,
-                                    "pores": 2,
-                                    "hair_loss": 2,
-                                    "itching": 2
-                                }
-                            ],
-                            "remarks": [
-                                {
-                                    "swelling": false,
-                                    "eczema": false,
-                                    "inflammation": false,
-                                    "scars": false,
-                                    "atopic_dermatitis": false,
-                                    "pain": false
-                                }
-                            ]
-                        }
-                    ],
-                    "hair": [
-                        {
-                            "luster": 1,
-                            "thickness": 2,
-                            "shape": 3,
-                            "hardness": 2,
-                            "elasticity": 2
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-}
+[
+    {
+        "id": 1,
+        "name": "山田 太郎",
+        "nameKana": "ヤマダ タロウ",
+        "sex": "男",
+        "birthday": "1996/01/01",
+        "phone": "090-1234-5678",
+        "comment": "ノーコメント",
+        "data": [
+            {
+                "date": "2024/08/26",
+                "scalp": [
+                    {
+                        "top": [
+                            {
+                                "redness": 1,
+                                "keratin": 1,
+                                "dryness": 1,
+                                "oiliness": 1,
+                                "pores": 1,
+                                "hair_loss": 1,
+                                "itching": 1
+                            }
+                        ],
+                        "side": [
+                            {
+                                "redness": 2,
+                                "keratin": 2,
+                                "dryness": 2,
+                                "oiliness": 2,
+                                "pores": 2,
+                                "hair_loss": 2,
+                                "itching": 2
+                            }
+                        ],
+                        "back": [
+                            {
+                                "redness": 3,
+                                "keratin": 3,
+                                "dryness": 3,
+                                "oiliness": 3,
+                                "pores": 3,
+                                "hair_loss": 3,
+                                "itching": 3
+                            }
+                        ],
+                        "nape": [
+                            {
+                                "redness": 2,
+                                "keratin": 2,
+                                "dryness": 2,
+                                "oiliness": 2,
+                                "pores": 2,
+                                "hair_loss": 2,
+                                "itching": 2
+                            }
+                        ],
+                        "remarks": [
+                            {
+                                "swelling": false,
+                                "eczema": false,
+                                "inflammation": false,
+                                "scars": false,
+                                "atopic_dermatitis": false,
+                                "pain": false
+                            }
+                        ]
+                    }
+                ],
+                "hair": [
+                    {
+                        "luster": 1,
+                        "thickness": 2,
+                        "shape": 3,
+                        "hardness": 2,
+                        "elasticity": 2
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -266,8 +266,8 @@
                             try {
                                 const importedData = JSON.parse(e.target.result);
 
-                                if (importedData && Array.isArray(importedData.customers)) {
-                                    this.customers = importedData.customers;
+                                if (importedData && Array.isArray(importedData)) {
+                                    this.customers = importedData;
                                     this.saveToLocalStorage();
                                     alert('データのインポートに成功しました。');
                                 } else {

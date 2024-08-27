@@ -63,6 +63,15 @@
                         <div v-show="show_page">
 
                             <template v-if="customer">
+                                <v-btn color="light-green lighten-3" class="mb-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="toggleEditMode">
+                                    <b>{{ editMode ? '編集を終了' : '編集' }}</b>
+                                </v-btn>
+
+                                <v-btn v-if="editMode" color="light-green lighten-3" class="mb-4 ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="saveChanges">
+                                    <b>保存</b>
+                                </v-btn>
 
 
                                 <v-card class="customer-card">
@@ -292,6 +301,11 @@
         .v-menu__content {
             background-color: #E8F5E9 !important;
         }
+
+
+        .edited {
+            background-color: #FFFF99 !important;
+        }
     </style>
     <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
 
@@ -362,13 +376,20 @@
                     hardness: { 1: '柔', 2: '普通', 3: '硬' },
                     elasticity: { 1: '弱', 2: '普通', 3: '強' }
                 },
+
+                editMode: false,
+                originalCustomer: null,
             },
             computed: {
                 selectedData() {
                     return this.customer && this.customer.data.length > 0
                         ? this.customer.data[this.selectedDataIndex]
                         : null;
-                }
+                },
+
+                isDataEdited() {
+                    return JSON.stringify(this.customer) !== JSON.stringify(this.originalCustomer);
+                },
             },
             methods: {
                 // System
@@ -417,7 +438,78 @@
                     const month = String(date.getMonth() + 1).padStart(2, '0');
                     const day = String(date.getDate()).padStart(2, '0');
                     return `${year}${month}${day}`;
-                }
+                },
+                toggleEditMode() {
+                    if (this.editMode) {
+                        if (this.isDataEdited) {
+                            if (confirm('変更を破棄しますか？')) {
+                                this.customer = JSON.parse(JSON.stringify(this.originalCustomer));
+                            } else {
+                                return;
+                            }
+                        }
+                    } else {
+                        this.originalCustomer = this.customer;
+                    }
+                    this.editMode = !this.editMode;
+                },
+
+                saveChanges() {
+                    let customers = JSON.parse(localStorage.getItem("CustomerData"));
+
+                    let index = customers.findIndex(c => c.id === this.customer.id);
+                    customers[index] = this.customer;
+                    localStorage.setItem("CustomerData", JSON.stringify(customers));
+
+                    // Export
+                    let dataStr = JSON.stringify(customers, null, 2);
+                    let dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+                    let exportFileDefaultName = 'all_customers_data.json';
+                    let linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+
+                    this.editMode = false;
+                    this.originalCustomer = JSON.parse(JSON.stringify(this.customer));
+                    alert('変更が保存され、顧客情報がエクスポートされました。');
+                },
+
+                addNewExamDate() {
+                    const newDate = new Date().toISOString().split('T')[0];
+                    const newData = {
+                        date: newDate,
+                        scalp: [
+                            {
+                                top: [{}],
+                                side: [{}],
+                                back: [{}],
+                                nape: [{}],
+                                remarks: [{}]
+                            }
+                        ],
+                        hair: [{}]
+                    };
+
+                    // 各セクションの初期値を設定
+                    for (let section in this.scalp_sections_map) {
+                        let englishSection = this.scalp_sections_map[section];
+                        for (let item in this.scalpItems) {
+                            newData.scalp[0][englishSection][0][item] = 1;
+                        }
+                    }
+
+                    for (let item in this.noteItems) {
+                        newData.scalp[0].remarks[0][item] = false;
+                    }
+
+                    for (let item in this.hairItems) {
+                        newData.hair[0][item] = 1;
+                    }
+
+                    this.customer.data.push(newData);
+                    this.selectedDataIndex = this.customer.data.length - 1;
+                },
             },
             mounted() {
                 $(window).ready(() => { this.show_page = true; });
