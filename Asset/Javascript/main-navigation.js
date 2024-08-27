@@ -8,7 +8,7 @@ Vue.component('main-navigation', {
 
 
             <!-- ▼ Home ▼ ------------------------------------------------------------------------------------->
-            <v-list-item href="./Home.html">
+            <v-list-item href="./index.html">
                 <v-list-item-icon><v-icon>mdi-home</v-icon></v-list-item-icon>
                 <v-list-item-title>ホーム</v-list-item-title>
             </v-list-item>
