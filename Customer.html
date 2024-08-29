@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <!-- ▼ Head ▼ ------------------------------------------------------------------------------------->
 
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
 
     <!-- ▼ Setting ▼ ---------------------------------------------------------------------------------->
@@ -86,13 +89,14 @@
                                                 transition="scale-transition" offset-y max-width="290px"
                                                 min-width="290px">
                                                 <template v-slot:activator="{ on, attrs }">
-                                                    <v-text-field v-model="newBirthday" label="生年月日" type="date"
-                                                        required filled rounded dense v-bind="attrs"
-                                                        v-on="on"></v-text-field>
+                                                    <v-text-field :value="formattedBirthday" label="生年月日" readonly
+                                                        v-bind="attrs" v-on="on" @click:append="birthdayMenu = true"
+                                                        append-icon="mdi-calendar" filled rounded dense></v-text-field>
                                                 </template>
                                                 <v-date-picker v-model="newBirthday" @input="birthdayMenu = false"
                                                     locale="ja-jp" :day-format="date => new Date(date).getDate()"
-                                                    :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"></v-date-picker>
+                                                    :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"
+                                                    color="#4CAF50" header-color="#81C784"></v-date-picker>
                                             </v-menu>
                                         </v-row>
                                         <v-row>
@@ -132,7 +136,7 @@
 
                             <v-row>
                                 <v-col class="d-flex justify-center">
-                                    <v-simple-table :style="{ 'max-width': '512px', 'width': '80%' }">
+                                    <v-simple-table id="list" :style="{ 'max-width': '512px', 'width': '80%' }">
                                         <template v-slot:default>
                                             <thead>
                                                 <tr>
@@ -233,28 +237,28 @@
 
 
         /* Table */
-        table {
+        #list {
             background-color: #e6f4ed;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             table-layout: fixed;
         }
 
-        thead,
-        tbody {
+        #list thead,
+        #list tbody {
             padding: 12px 16px;
         }
 
-        thead {
+        #list thead {
             background-color: #d0ece2;
             font-weight: 500;
         }
 
-        tbody {
+        #list tbody {
             border-bottom: 1px solid #c2e0d6;
         }
 
-        td {
+        #list td {
             user-select: all;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -314,6 +318,43 @@
         .sort {
             background-color: #d0a0c0;
         }
+
+        /* Data Picker */
+        .v-date-picker-header {
+            background-color: #81C784 !important;
+            color: white !important;
+        }
+
+        .v-date-picker-table th {
+            color: #4CAF50 !important;
+            background-color: white !important;
+        }
+
+        .v-date-picker-table td {
+            background-color: white !important;
+            border: none !important;
+        }
+
+        .v-date-picker-table__current {
+            border-color: #4CAF50 !important;
+        }
+
+        .v-date-picker-table .v-btn.v-btn--outlined {
+            border-color: #81C784 !important;
+        }
+
+        .v-date-picker-table .v-btn.v-btn--outlined:hover {
+            background-color: #E8F5E9 !important;
+        }
+
+        .v-date-picker-table .v-btn.v-btn--outlined.v-btn--active {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+
+        .v-text-field>>>.v-input__slot {
+            cursor: pointer;
+        }
     </style>
     <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
 
@@ -336,30 +377,13 @@
         // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
-            vuetify: new Vuetify({
-                lang: {
-                    locales: { ja: "ja" },
-                    current: 'ja',
-                },
-            }),
+            vuetify: new Vuetify({}),
             data: {
                 drawer: false,
                 show_page: false,
 
                 searchText: '',
-                customers: [
-                    // { id: 1, name: '山田 太郎', nameKana: 'ヤマダ タロウ', phone: '090-1234-5678' },
-                    // { id: 2, name: '佐藤 花子', nameKana: 'サトウ ハナコ', phone: '080-9876-5432' },
-                    // { id: 3, name: '鈴木 次郎', nameKana: 'スズキ ジロウ', phone: '070-5678-1234' },
-                    // { id: 4, name: '田中 三郎', nameKana: 'タナカ サブロウ', phone: '060-1234-9876' },
-                    // { id: 5, name: '山本 四郎', nameKana: 'ヤマモト シロウ', phone: '090-5678-1234' },
-                    // { id: 6, name: '斎藤 五郎', nameKana: 'サイトウ ゴロウ', phone: '080-1234-5678' },
-                    // { id: 7, name: '高橋 六郎', nameKana: 'タカハシ ロクロウ', phone: '070-9876-5432' },
-                    // { id: 8, name: '伊藤 七郎', nameKana: 'イトウ シチロウ', phone: '060-5678-1234' },
-                    // { id: 9, name: '中村 八郎', nameKana: 'ナカムラ ハチロウ', phone: '090-1234-9876' },
-                    // { id: 10, name: '小林 九郎', nameKana: 'コバヤシ クロウ', phone: '080-5678-1234' },
-                    // { id: 11, name: '渡辺 十郎', nameKana: 'ワタナベ ジュウロウ', phone: '070-1234-5678' },
-                ],
+                customers: [],
                 filteredCustomers: [],
                 page: 1,
                 activeIndex: -1,
@@ -370,6 +394,8 @@
                 showAddCustomerDialog: false,
                 newCustomerName: '',
                 newCustomerNameKana: '',
+                newSex: '',
+                newBirthday: '',
                 newCustomerPhone: '',
 
                 birthdayMenu: false,
@@ -384,7 +410,12 @@
                     const customers = this.currentPageCustomers;
                     const emptyRows = new Array(10 - customers.length).fill({});
                     return [...customers, ...emptyRows];
-                }
+                },
+                formattedBirthday() {
+                    if (!this.newBirthday) return '';
+                    const [year, month, day] = this.newBirthday.split('-');
+                    return `${year}/${month}/${day}`;
+                },
             },
             methods: {
                 // System

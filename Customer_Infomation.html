@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 
 <!-- ▼ Head ▼ ------------------------------------------------------------------------------------->
 
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 
     <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
@@ -78,7 +80,8 @@
                                         <v-card-text>
                                             <v-date-picker v-model="newExamDate" full-width locale="ja-jp"
                                                 :day-format="date => new Date(date).getDate()"
-                                                :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"></v-date-picker>
+                                                :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"
+                                                color="#4CAF50" header-color="#81C784"></v-date-picker>
                                         </v-card-text>
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
@@ -120,16 +123,21 @@
                                             <v-col>
                                                 <v-menu v-model="birthdayMenu" :close-on-content-click="false"
                                                     transition="scale-transition" offset-y max-width="290px"
-                                                    min-width="290px">
+                                                    min-width="290px" :disabled="!editMode">
                                                     <template v-slot:activator="{ on, attrs }">
-                                                        <v-text-field v-model="customer.birthday" label="生年月日" readonly
-                                                            v-bind="attrs" v-on="on"
-                                                            :class="{ 'edited': editMode && customer.birthday !== originalCustomer.birthday }"></v-text-field>
+                                                        <v-text-field :value="formattedBirthday" label="生年月日" readonly
+                                                            v-bind="attrs" v-on="editMode ? on : {}"
+                                                            @click:append="editMode && (birthdayMenu = true)"
+                                                            :append-icon="editMode ? 'mdi-calendar' : ''"
+                                                            :class="{ 'edited': editMode && customer.birthday !== originalCustomer.birthday }">
+                                                        </v-text-field>
                                                     </template>
-                                                    <v-date-picker v-model="customer.birthday"
-                                                        @input="birthdayMenu = false" :readonly="!editMode"
-                                                        locale="ja-jp" :day-format="date => new Date(date).getDate()"
-                                                        :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"></v-date-picker>
+                                                    <v-date-picker v-if="editMode" v-model="customer.birthday"
+                                                        @input="birthdayMenu = false" locale="ja-jp"
+                                                        :day-format="date => new Date(date).getDate()"
+                                                        :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"
+                                                        color="#4CAF50" header-color="#81C784">
+                                                    </v-date-picker>
                                                 </v-menu>
                                             </v-col>
                                             <v-col>
@@ -174,7 +182,7 @@
                                                 </v-tabs>
                                                 <v-tabs-items v-model="activeTab">
                                                     <v-tab-item v-for="section in scalp_sections" :key="section">
-                                                        <v-img :src="getImageSrc()" aspect-ratio="1"
+                                                        <v-img :src="imageSrc" aspect-ratio="1"
                                                             class="scalp-image"></v-img>
                                                         <v-card flat>
                                                             <v-card-text>
@@ -369,6 +377,33 @@
         .edited {
             background-color: rgba(216, 238, 221, 0.3) !important;
         }
+
+        /* Data Picker */
+        .v-date-picker-header {
+            background-color: #81C784 !important;
+            color: white !important;
+        }
+
+        .v-date-picker-table th {
+            color: #4CAF50 !important;
+        }
+
+        .v-date-picker-table__current {
+            border-color: #4CAF50 !important;
+        }
+
+        .v-date-picker-table .v-btn.v-btn--outlined {
+            border-color: #81C784 !important;
+        }
+
+        .v-date-picker-table .v-btn.v-btn--outlined:hover {
+            background-color: #E8F5E9 !important;
+        }
+
+        .v-date-picker-table .v-btn.v-btn--outlined.v-btn--active {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
     </style>
     <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
 
@@ -395,12 +430,7 @@
         // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
-            vuetify: new Vuetify({
-                lang: {
-                    locales: { ja: "ja" },
-                    current: 'ja',
-                },
-            }),
+            vuetify: new Vuetify({}),
             data: {
                 drawer: false,
                 show_page: false,
@@ -453,6 +483,10 @@
                 showDatePicker: false,
 
                 birthdayMenu: false,
+
+                selectedDataIndex: 0,
+
+                imageSrc: './Asset/Image/Test_1.png',
             },
             computed: {
                 selectedData() {
@@ -463,6 +497,19 @@
                 isDataEdited() {
                     return JSON.stringify(this.customer) !== JSON.stringify(this.originalCustomer);
                 },
+                formattedBirthday() {
+                    if (!this.customer.birthday) return '';
+                    const [year, month, day] = this.customer.birthday.split('-');
+                    return `${year}/${month}/${day}`;
+                },
+            },
+            watch: {
+                selectedDataIndex() {
+                    this.getImageSrc();
+                },
+                activeTab() {
+                    this.getImageSrc();
+                }
             },
             methods: {
                 // System
@@ -495,14 +542,25 @@
 
                 getImageSrc() {
                     if (!this.customer || !this.selectedData || this.activeTab === null) {
-                        return '';
+                        this.imageSrc = './Asset/Image/Test_1.png';
+                        return;
                     }
 
                     const customerName = this.customer.name;
                     const examDate = this.formatDate(this.selectedData.date);
                     const activeSection = this.scalp_sections[this.activeTab];
 
-                    return `./Asset/Image/${customerName}_${examDate}_${activeSection}.png`;
+                    const imagePath = `./Asset/Image/${customerName}_${examDate}_${activeSection}.png`;
+
+                    // 画像の存在確認
+                    const img = new Image();
+                    img.onload = () => {
+                        this.imageSrc = imagePath;
+                    };
+                    img.onerror = () => {
+                        this.imageSrc = './Asset/Image/Test_1.png';
+                    };
+                    img.src = imagePath;
                 },
 
                 formatDate(dateString) {
@@ -513,11 +571,22 @@
                     return `${year}${month}${day}`;
                 },
 
+                resetCustomerData() {
+                    if (this.originalCustomer) {
+                        this.customer = JSON.parse(JSON.stringify(this.originalCustomer));
+                        if (this.customer.data.length > 0) {
+                            this.selectedDataIndex = this.customer.data.length - 1;
+                        } else {
+                            this.selectedDataIndex = null;
+                        }
+                    }
+                },
                 toggleEditMode() {
                     if (this.editMode) {
                         if (this.isDataEdited) {
                             if (confirm('変更を破棄しますか？')) {
                                 this.customer = JSON.parse(JSON.stringify(this.originalCustomer));
+                                this.selectedDataIndex = 0;
                             } else {
                                 return;
                             }
@@ -552,21 +621,9 @@
                     }
                 },
 
-                addNewExamDate() {
-                    if (!this.newExamDate) {
-                        alert('診断日を選択してください。');
-                        return;
-                    }
-
-                    const formattedDate = new Date(this.newExamDate).toISOString().split('T')[0];
-
-                    if (this.customer.data.some(d => d.date === formattedDate)) {
-                        alert('この日付の診断データは既に存在します。');
-                        return;
-                    }
-
+                createNewExamData(date) {
                     const newData = {
-                        date: formattedDate,
+                        date: date,
                         scalp: [
                             {
                                 top: [{}],
@@ -595,9 +652,25 @@
                         newData.hair[0][item] = 1;
                     }
 
+                    return newData;
+                },
+                addNewExamDate() {
+                    if (!this.newExamDate) {
+                        alert('診断日を選択してください。');
+                        return;
+                    }
+
+                    const formattedDate = new Date(this.newExamDate).toISOString().split('T')[0];
+
+                    if (this.customer.data.some(d => d.date === formattedDate)) {
+                        alert('この日付の診断データは既に存在します。');
+                        return;
+                    }
+
+                    const newData = this.createNewExamData(formattedDate);
 
                     this.customer.data.push(newData);
-                    this.customer.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
                     this.selectedDataIndex = this.customer.data.findIndex(d => d.date === formattedDate);
                     this.showDatePicker = false;
                     this.newExamDate = null;
@@ -606,11 +679,32 @@
                     if (confirm('この診断データを削除してもよろしいですか？')) {
                         this.customer.data.splice(index, 1);
                         if (this.customer.data.length > 0) {
-                            this.selectedDataIndex = this.customer.data.length - 1;
+                            this.selectedDataIndex = 0;
                         } else {
                             this.selectedDataIndex = null;
                         }
                     }
+                },
+                isValidExamData(data) {
+                    if (!data.scalp || !data.hair) return false;
+
+                    for (let section in this.scalp_sections_map) {
+                        let englishSection = this.scalp_sections_map[section];
+                        if (!data.scalp[0][englishSection] || !data.scalp[0][englishSection][0]) return false;
+                        for (let item in this.scalpItems) {
+                            if (typeof data.scalp[0][englishSection][0][item] !== 'number') return false;
+                        }
+                    }
+
+                    for (let item in this.noteItems) {
+                        if (typeof data.scalp[0].remarks[0][item] !== 'boolean') return false;
+                    }
+
+                    for (let item in this.hairItems) {
+                        if (typeof data.hair[0][item] !== 'number') return false;
+                    }
+
+                    return true;
                 },
 
                 openDatePicker() {
@@ -629,7 +723,20 @@
                     console.error('Customer not found');
                     return;
                 }
-                this.selectedDataIndex = this.customer.data.length > 0 ? this.customer.data.length - 1 : null;
+
+                // Ensure all exam data have the correct structure
+                this.customer.data = this.customer.data.map(data => {
+                    if (!this.isValidExamData(data)) {
+                        return this.createNewExamData(data.date);
+                    }
+                    return data;
+                });
+
+                // Sort data by date in descending order
+                this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                this.selectedDataIndex = 0;
+
+                this.getImageSrc();
             },
         });
 
