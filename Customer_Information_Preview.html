@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,71 +15,162 @@
             width: 210mm;
             height: 297mm;
         }
+
         .page {
             page-break-after: always;
         }
-        h1, h2, h3 {
+
+        h1,
+        h2,
+        h3 {
             color: #4CAF50;
         }
+
         table {
-            width: 100%;
+            width: 45%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            float: left;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #4CAF50;
             color: white;
         }
-        .scalp-images {
+
+        .status-good {
+            color: blue;
+        }
+
+        .status-normal {
+            color: green;
+        }
+
+        .status-caution {
+            color: red;
+        }
+
+        .status-none {
+            color: blue;
+        }
+
+        .status-exists {
+            color: red;
+        }
+
+        .content-wrapper {
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
+
         .scalp-image {
-            width: 48%;
+            width: 45%;
+            text-align: center;
+        }
+
+        .scalp-image img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+
+        .notes-section {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            clear: both;
+        }
+
+        .notes-title {
+            font-weight: bold;
             margin-bottom: 10px;
         }
+
+        .notes-content {
+            height: 100px;
+            border: 1px solid #ddd;
+        }
+
+        #basic-info table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        #basic-info th,
+        #basic-info td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #hair-status td {
+            color: black;
+        }
+
         @media print {
             body {
                 width: 210mm;
                 height: 297mm;
             }
+
             .page {
                 page-break-after: always;
             }
+            
+            .back-button {
+                display: none;
+            }
+        }
+
+        .back-button {
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
         }
     </style>
 </head>
+
 <body>
     <div id="app">
+        <button class="back-button" onclick="goBack()">戻る</button>
         <div class="page">
             <h1>顧客情報</h1>
-            <table>
-                <tr>
-                    <th>名前</th>
-                    <td>{{ customer.name }}</td>
-                    <th>カタカナ</th>
-                    <td>{{ customer.nameKana }}</td>
-                </tr>
-                <tr>
-                    <th>性別</th>
-                    <td>{{ customer.sex }}</td>
-                    <th>生年月日</th>
-                    <td>{{ customer.birthday }}</td>
-                </tr>
-                <tr>
-                    <th>年齢</th>
-                    <td>{{ calculateAge(customer.birthday) }}歳</td>
-                    <th>電話番号</th>
-                    <td>{{ customer.phone }}</td>
-                </tr>
-            </table>
+            <div id="basic-info">
+                <table>
+                    <tr>
+                        <th>名前</th>
+                        <td>{{ customer.name }}</td>
+                        <th>カタカナ</th>
+                        <td>{{ customer.nameKana }}</td>
+                    </tr>
+                    <tr>
+                        <th>性別</th>
+                        <td>{{ customer.sex }}</td>
+                        <th>生年月日</th>
+                        <td>{{ customer.birthday }}</td>
+                    </tr>
+                    <tr>
+                        <th>年齢</th>
+                        <td>{{ calculateAge(customer.birthday) }}歳</td>
+                        <th>電話番号</th>
+                        <td>{{ customer.phone }}</td>
+                    </tr>
+                </table>
+            </div>
 
             <h2>コメント</h2>
             <p>{{ customer.comment }}</p>
@@ -86,52 +178,65 @@
             <template v-for="(data, dataIndex) in customer.data">
                 <div class="page">
                     <h2>診断日: {{ data.date }}</h2>
-                    
+
                     <h3>頭皮の状態</h3>
                     <div v-for="section in ['top', 'side', 'back', 'nape']">
                         <h4>{{ getSectionName(section) }}</h4>
+                        <div class="content-wrapper">
+                            <table>
+                                <tr>
+                                    <th>項目</th>
+                                    <th>状態</th>
+                                </tr>
+                                <tr v-for="(item, key) in scalpItems">
+                                    <td>{{ item }}</td>
+                                    <td :class="getStatusClass(data.scalp[0][section][0][key])">
+                                        {{ getStatusText(data.scalp[0][section][0][key]) }}
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="scalp-image">
+                                <img :src="getImageSrc(customer.name, data.date, section)"
+                                    :alt="getSectionName(section)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>備考</h3>
+                    <div class="content-wrapper">
                         <table>
                             <tr>
                                 <th>項目</th>
                                 <th>状態</th>
                             </tr>
-                            <tr v-for="(item, key) in scalpItems">
+                            <tr v-for="(item, key) in noteItems">
                                 <td>{{ item }}</td>
-                                <td>{{ getStatusText(data.scalp[0][section][0][key]) }}</td>
+                                <td :class="data.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
+                                    {{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
+                                </td>
                             </tr>
                         </table>
                     </div>
 
-                    <h3>備考</h3>
-                    <table>
-                        <tr>
-                            <th>項目</th>
-                            <th>状態</th>
-                        </tr>
-                        <tr v-for="(item, key) in noteItems">
-                            <td>{{ item }}</td>
-                            <td>{{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}</td>
-                        </tr>
-                    </table>
-
                     <h3>毛髪の状態</h3>
-                    <table>
-                        <tr>
-                            <th>項目</th>
-                            <th>状態</th>
-                        </tr>
-                        <tr v-for="(item, key) in hairItems">
-                            <td>{{ item }}</td>
-                            <td>{{ getHairStatusText(key, data.hair[0][key]) }}</td>
-                        </tr>
-                    </table>
+                    <div class="content-wrapper">
+                        <table id="hair-status">
+                            <tr>
+                                <th>項目</th>
+                                <th>状態</th>
+                            </tr>
+                            <tr v-for="(item, key) in hairItems">
+                                <td>{{ item }}</td>
+                                <td>
+                                    {{ getHairStatusText(key, data.hair[0][key]) }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
 
-                    <h3>頭皮画像</h3>
-                    <div class="scalp-images">
-                        <img v-for="section in ['top', 'side', 'back', 'nape']" 
-                             :src="getImageSrc(customer.name, data.date, section)"
-                             :alt="getSectionName(section)"
-                             class="scalp-image">
+                    <div class="notes-section">
+                        <div class="notes-title">備考:</div>
+                        <div class="notes-content"></div>
                     </div>
                 </div>
             </template>
@@ -140,6 +245,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script>
+        function goBack() {
+            const customerId = new URLSearchParams(window.location.search).get('id');
+            window.location.href = `Customer_Information.html?id=${customerId}`;
+        }
+
         new Vue({
             el: '#app',
             data: {
@@ -174,7 +284,8 @@
                     shape: { 1: '直毛', 2: '普通', 3: '癖毛' },
                     hardness: { 1: '柔', 2: '普通', 3: '硬' },
                     elasticity: { 1: '弱', 2: '普通', 3: '強' }
-                }
+                },
+                imageSrc: './Asset/Image/Test_1.png',
             },
             mounted() {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -188,8 +299,6 @@
                 }
 
                 this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                console.log(this.customer.data[0].hair[0].elasticity);
             },
             methods: {
                 calculateAge(birthday) {
@@ -215,12 +324,32 @@
                     const statusTexts = ['', '良好', '普通', '注意'];
                     return statusTexts[value] || '';
                 },
+                getStatusClass(value) {
+                    const statusClasses = ['', 'status-good', 'status-normal', 'status-caution'];
+                    return statusClasses[value] || '';
+                },
                 getHairStatusText(key, value) {
                     return this.hairLabels[key][value];
                 },
                 getImageSrc(customerName, examDate, section) {
+                    if (!customerName || !examDate || !section) {
+                        return this.imageSrc;
+                    }
+
                     const formattedDate = this.formatDate(examDate);
-                    return `./Asset/Image/${customerName}_${formattedDate}_${this.getSectionName(section)}.png`;
+                    const sectionName = this.getSectionName(section);
+                    const imagePath = `./Asset/Image/${customerName}_${formattedDate}_${sectionName}.png`;
+
+                    const img = new Image();
+                    img.onload = () => {
+                        this.imageSrc = imagePath;
+                    };
+                    img.onerror = () => {
+                        this.imageSrc = './Asset/Image/Test_1.png';
+                    };
+                    img.src = imagePath;
+
+                    return this.imageSrc;
                 },
                 formatDate(dateString) {
                     const date = new Date(dateString);
@@ -233,4 +362,5 @@
         });
     </script>
 </body>
+
 </html>

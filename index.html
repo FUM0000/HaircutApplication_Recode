@@ -58,7 +58,7 @@
                                                 <tr v-for="Customer in FilteredCustomers" :key="Customer.id">
                                                     <td>
                                                         <a v-if="Customer.id"
-                                                            :href="'./Customer_Infomation.html?id=' + Customer.id">
+                                                            :href="'./Customer_Information.html?id=' + Customer.id">
                                                             {{ Customer.name || '' }}
                                                         </a>
                                                         <span v-else>{{ Customer.name || '' }}</span>

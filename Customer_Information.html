@@ -55,6 +55,10 @@
                                     :style="{ height: '48px', color: '#404040' }" @click="Save_Changes">
                                     <b>保存</b>
                                 </v-btn>
+                                <v-btn color="light-green lighten-3" class="mb-4 ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="Open_Print_Preview">
+                                    <b>印刷プレビュー</b>
+                                </v-btn>
 
                                 <v-card class="customer-card">
                                     <v-card-title class="section-title d-flex">基本情報</v-card-title>
@@ -128,7 +132,8 @@
                                             class="ml-4 date-select"
                                             style="max-width: 150px; padding-top: 20px;"></v-select>
                                         <v-spacer></v-spacer>
-                                        <v-btn v-if="Edit_Mode" color="error" @click="Delete_Exam_Date(Selected_Data_Index)">
+                                        <v-btn v-if="Edit_Mode" color="error"
+                                            @click="Delete_Exam_Date(Selected_Data_Index)">
                                             診断データを削除
                                         </v-btn>
                                     </v-card-title>
@@ -249,8 +254,8 @@
                                     </v-card-text>
                                 </v-card>
 
-                                <v-btn color="light-green lighten-3" class="ml-4"
-                                    :style="{ height: '48px', color: '#404040' }" @click="Go_Back"><b>戻る</b></v-btn>
+                                <!-- <v-btn color="light-green lighten-3" class="ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="Go_Back"><b>戻る</b></v-btn> -->
                             </template>
                             <template v-else>
                                 <v-card>
@@ -646,6 +651,10 @@
                 },
                 Open_Date_Picker() {
                     this.Show_Date_Picker = true;
+                },
+                Open_Print_Preview() {
+                    const customerId = new URLSearchParams(window.location.search).get('id');
+                    window.open(`Customer_Information_Preview.html?id=${customerId}`, '_blank');
                 },
             },
         });
