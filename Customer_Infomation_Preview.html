@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顧客情報プレビュー</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            width: 210mm;
+            height: 297mm;
+        }
+        .page {
+            page-break-after: always;
+        }
+        h1, h2, h3 {
+            color: #4CAF50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .scalp-images {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .scalp-image {
+            width: 48%;
+            margin-bottom: 10px;
+        }
+        @media print {
+            body {
+                width: 210mm;
+                height: 297mm;
+            }
+            .page {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="page">
+            <h1>顧客情報</h1>
+            <table>
+                <tr>
+                    <th>名前</th>
+                    <td>{{ customer.name }}</td>
+                    <th>カタカナ</th>
+                    <td>{{ customer.nameKana }}</td>
+                </tr>
+                <tr>
+                    <th>性別</th>
+                    <td>{{ customer.sex }}</td>
+                    <th>生年月日</th>
+                    <td>{{ customer.birthday }}</td>
+                </tr>
+                <tr>
+                    <th>年齢</th>
+                    <td>{{ calculateAge(customer.birthday) }}歳</td>
+                    <th>電話番号</th>
+                    <td>{{ customer.phone }}</td>
+                </tr>
+            </table>
+
+            <h2>コメント</h2>
+            <p>{{ customer.comment }}</p>
+
+            <template v-for="(data, dataIndex) in customer.data">
+                <div class="page">
+                    <h2>診断日: {{ data.date }}</h2>
+                    
+                    <h3>頭皮の状態</h3>
+                    <div v-for="section in ['top', 'side', 'back', 'nape']">
+                        <h4>{{ getSectionName(section) }}</h4>
+                        <table>
+                            <tr>
+                                <th>項目</th>
+                                <th>状態</th>
+                            </tr>
+                            <tr v-for="(item, key) in scalpItems">
+                                <td>{{ item }}</td>
+                                <td>{{ getStatusText(data.scalp[0][section][0][key]) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3>備考</h3>
+                    <table>
+                        <tr>
+                            <th>項目</th>
+                            <th>状態</th>
+                        </tr>
+                        <tr v-for="(item, key) in noteItems">
+                            <td>{{ item }}</td>
+                            <td>{{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}</td>
+                        </tr>
+                    </table>
+
+                    <h3>毛髪の状態</h3>
+                    <table>
+                        <tr>
+                            <th>項目</th>
+                            <th>状態</th>
+                        </tr>
+                        <tr v-for="(item, key) in hairItems">
+                            <td>{{ item }}</td>
+                            <td>{{ getHairStatusText(key, data.hair[0][key]) }}</td>
+                        </tr>
+                    </table>
+
+                    <h3>頭皮画像</h3>
+                    <div class="scalp-images">
+                        <img v-for="section in ['top', 'side', 'back', 'nape']" 
+                             :src="getImageSrc(customer.name, data.date, section)"
+                             :alt="getSectionName(section)"
+                             class="scalp-image">
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                customer: null,
+                scalpItems: {
+                    redness: '赤み',
+                    keratin: '角質',
+                    dryness: '乾燥',
+                    oiliness: '油分',
+                    pores: '毛穴',
+                    hair_loss: '抜け毛',
+                    itching: 'かゆみ'
+                },
+                hairItems: {
+                    luster: 'ツヤ',
+                    thickness: '太さ',
+                    shape: '形状',
+                    hardness: '硬さ',
+                    elasticity: '弾力'
+                },
+                noteItems: {
+                    swelling: '腫れ',
+                    eczema: '湿疹',
+                    inflammation: '炎症',
+                    scars: '傷',
+                    atopic_dermatitis: 'アトピー',
+                    pain: '痛み'
+                },
+                hairLabels: {
+                    luster: { 1: 'なし', 2: '普通', 3: 'あり' },
+                    thickness: { 1: '細', 2: '普通', 3: '太' },
+                    shape: { 1: '直毛', 2: '普通', 3: '癖毛' },
+                    hardness: { 1: '柔', 2: '普通', 3: '硬' },
+                    elasticity: { 1: '弱', 2: '普通', 3: '強' }
+                }
+            },
+            mounted() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const customerId = urlParams.get('id');
+                const customers = JSON.parse(localStorage.getItem("CustomerData"));
+                this.customer = customers.find(c => c.id === parseInt(customerId));
+
+                if (!this.customer) {
+                    console.error('Customer not found');
+                    return;
+                }
+
+                this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                console.log(this.customer.data[0].hair[0].elasticity);
+            },
+            methods: {
+                calculateAge(birthday) {
+                    const birthDate = new Date(birthday);
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                        age--;
+                    }
+                    return age;
+                },
+                getSectionName(section) {
+                    const sectionNames = {
+                        'top': 'トップ',
+                        'side': 'サイド',
+                        'back': 'バック',
+                        'nape': 'ネープ'
+                    };
+                    return sectionNames[section];
+                },
+                getStatusText(value) {
+                    const statusTexts = ['', '良好', '普通', '注意'];
+                    return statusTexts[value] || '';
+                },
+                getHairStatusText(key, value) {
+                    return this.hairLabels[key][value];
+                },
+                getImageSrc(customerName, examDate, section) {
+                    const formattedDate = this.formatDate(examDate);
+                    return `./Asset/Image/${customerName}_${formattedDate}_${this.getSectionName(section)}.png`;
+                },
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}${month}${day}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

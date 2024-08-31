@@ -1,83 +1,43 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-
-<!-- ▼ Head ▼ ------------------------------------------------------------------------------------->
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-
-    <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
-
-
-    <!-- ▼ Setting ▼ ---------------------------------------------------------------------------------->
-    <meta name="version" content="0.0.1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <!-- ▲ Setting ▲ ---------------------------------------------------------------------------------->
-
-
-    <!-- ▼ Reference ▼ -------------------------------------------------------------------------------->
-    <!-- Vue -->
+    <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-    <!-- CSS -->
     <link href="./Asset/CSS/Common_1.css" rel="stylesheet" />
-    <!-- ▲ Reference ▲ -------------------------------------------------------------------------------->
-
-
 </head>
-<!-- ▲ Head ▲ ------------------------------------------------------------------------------------->
-
-
-<!-- ▼ Body ▼ ------------------------------------------------------------------------------------->
 
 <body>
-
-
-    <!-- ▼ App ▼ -------------------------------------------------------------------------------------->
     <v-app id="app">
         <template>
+            <main-system-bar :drawer="Drawer" @change-drawer="Change_Drawer">
+                <v-icon>mdi-home</v-icon>ホーム
+            </main-system-bar>
 
+            <main-navigation :drawer="Drawer" @change-drawer="Change_Drawer"></main-navigation>
 
-            <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
-            <main-system-bar :drawer="drawer"
-                @change-drawer="Change_Drawer"><v-icon>mdi-home</v-icon>ホーム</main-system-bar>
-            <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
-
-
-            <!-- ▼ Navigation ▼ ------------------------------------------------------------------------------->
-            <main-navigation :drawer="drawer" @change-drawer="Change_Drawer"></main-navigation>
-            <!-- ▲ Navigation ▲ ------------------------------------------------------------------------------->
-
-
-            <!-- ▼ Main ▼ ------------------------------------------------------------------------------------->
             <v-main id="main">
                 <v-container id="main-container" class="d-flex flex-column" fluid fill-height>
-
-
                     <transition name="fade-page">
-                        <div v-show="show_page" style="width: 100%;">
-
+                        <div v-show="Show_Page" style="width: 100%;">
                             <v-row style="margin-top: 50px">
                                 <v-col class="d-flex justify-center">
                                     <v-btn @click="$refs.fileInput.click()" class="custom-btn"><b>データをインポート</b></v-btn>
-                                    <input type="file" ref="fileInput" style="display: none" @change="importData"
+                                    <input type="file" ref="fileInput" style="display: none" @change="Import_Data"
                                         accept=".json">
                                 </v-col>
                             </v-row>
 
                             <v-row style="margin-top: 50px">
                                 <v-col class="d-flex justify-center">
-                                    <v-text-field v-model="searchText" class="search-field" prepend-icon="mdi-magnify"
-                                        label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="search"
-                                        @click:clear="ClearSearch"
-                                        :style="{ 'max-width': '512px', 'width': '90%' }"></v-text-field>
+                                    <v-text-field v-model="SearchText" class="Search-field" prepend-icon="mdi-magnify"
+                                        label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="Search"
+                                        @click:clear="Clear_Search" :style="{ 'max-width': '512px', 'width': '90%' }">
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
 
@@ -92,41 +52,32 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-if="customers.length === 0">
+                                                <tr v-if="Customers.length === 0">
                                                     <td colspan="2" class="text-center">データがありません。インポートしてください。</td>
                                                 </tr>
-                                                <tr v-for="customer in filteredCustomers" :key="customer.id">
+                                                <tr v-for="Customer in FilteredCustomers" :key="Customer.id">
                                                     <td>
-                                                        <a v-if="customer.id"
-                                                            :href="'./Customer_Infomation.html?id=' + customer.id">{{
-                                                            customer.name || '' }}</a>
-                                                        <span v-else>{{ customer.name || '' }}</span>
+                                                        <a v-if="Customer.id"
+                                                            :href="'./Customer_Infomation.html?id=' + Customer.id">
+                                                            {{ Customer.name || '' }}
+                                                        </a>
+                                                        <span v-else>{{ Customer.name || '' }}</span>
                                                     </td>
-                                                    <td>{{ customer.phone }}</td>
+                                                    <td>{{ Customer.phone }}</td>
                                                 </tr>
                                             </tbody>
                                         </template>
                                     </v-simple-table>
                                 </v-col>
                             </v-row>
-
                         </div>
                     </transition>
-
-
                 </v-container>
             </v-main>
-            <!-- ▲ Main ▲ ------------------------------------------------------------------------------------->
-
-
         </template>
     </v-app>
-    <!-- ▲ App ▲ -------------------------------------------------------------------------------------->
 
-
-    <!-- ▼ Style ▼ ------------------------------------------------------------------------------------>
     <style>
-        /* Fade */
         .fade-page-enter-active,
         .fade-page-leave-active {
             transition: opacity 2s;
@@ -137,8 +88,6 @@
             opacity: 0;
         }
 
-
-        /* Import, Export */
         .custom-btn {
             background-color: rgba(255, 255, 255, 0.1) !important;
             border: 5px solid #adff2f !important;
@@ -147,22 +96,18 @@
             padding: 20px 30px !important;
         }
 
-
-        /* Search */
-        .search-field>>>.v-input__prepend-outer {
+        .Search-field>>>.v-input__prepend-outer {
             margin-right: 8px;
         }
 
-        .search-field>>>.v-input__slot {
+        .Search-field>>>.v-input__slot {
             border-radius: 25px;
         }
 
-        .search-field>>>.v-input__icon--prepend {
+        .Search-field>>>.v-input__icon--prepend {
             margin-left: 16px;
         }
 
-
-        /* Table */
         table {
             background-color: #e6f4ed;
             border-radius: 8px;
@@ -191,87 +136,62 @@
             white-space: nowrap;
         }
     </style>
-    <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
 
-
-    <!-- ▼ Script Reference ▼ ------------------------------------------------------------------------->
-    <!-- Main -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/lang/ja.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vector-js@4.1.1/dist/vector.min.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <!-- Compornent -->
-    <script src="./Asset/Javascript/common.js"></script>
     <script src="./Asset/Javascript/main-system-bar.js"></script>
     <script src="./Asset/Javascript/main-navigation.js"></script>
-    <!-- ▲ Script Reference ▲ ------------------------------------------------------------------------->
 
-
-    <!-- ▼ Script Content ▼ --------------------------------------------------------------------------->
     <script>
-
-
-        // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
             vuetify: new Vuetify(),
             data: {
-                drawer: false,
-                show_page: false,
-
-
-                searchText: '',
-                customers: [],
-                filteredCustomers: [],
+                Drawer: false,
+                Show_Page: false,
+                Customers: [],
+                SearchText: '',
+                FilteredCustomers: [],
+            },
+            mounted() {
+                this.Load_LocalStrage();
+                $(window).ready(() => { this.Show_Page = true; });
             },
             methods: {
-                // System
                 Change_Drawer(_value) {
-                    this.drawer = _value;
+                    this.Drawer = _value;
                 },
 
-
-                saveToLocalStorage() {
-                    localStorage.setItem("CustomerData", JSON.stringify(this.customers));
-                },
-
-                loadFromLocalStorage() {
-                    const storedData = localStorage.getItem("CustomerData");
-                    if (storedData) {
-                        this.customers = JSON.parse(storedData);
-                    }
-                },
-
-
-                search() {
-                    if (this.searchText.trim() === '') {
-                        this.filteredCustomers = [];
+                Search() {
+                    if (this.SearchText.trim() === '') {
+                        this.FilteredCustomers = [];
                     } else {
-                        this.filteredCustomers = this.customers.filter(customer => {
-                            const searchText = this.searchText.toLowerCase();
-                            return customer.name.toLowerCase().includes(searchText) || customer.nameKana.toLowerCase().includes(searchText) || customer.phone.toLowerCase().includes(searchText);
+                        this.FilteredCustomers = this.Customers.filter(Customer => {
+                            const searchText = this.SearchText.toLowerCase();
+                            return Customer.name.toLowerCase().includes(searchText) ||
+                                Customer.nameKana.toLowerCase().includes(searchText) ||
+                                Customer.phone.toLowerCase().includes(searchText);
                         });
                     }
                 },
-                ClearSearch() {
-                    this.searchText = '';
-                    this.filteredCustomers = [];
+                Clear_Search() {
+                    this.SearchText = '';
+                    this.FilteredCustomers = [];
                 },
 
-
-                importData(event) {
+                Import_Data(event) {
                     const file = event.target.files[0];
                     if (file) {
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             try {
                                 const importedData = JSON.parse(e.target.result);
-
                                 if (importedData && Array.isArray(importedData)) {
-                                    this.customers = importedData;
-                                    this.saveToLocalStorage();
+                                    this.Customers = importedData;
+                                    this.Save_LocalStrage();
                                     alert('データのインポートに成功しました。');
                                 } else {
                                     throw new Error('Invalid data format');
@@ -282,22 +202,21 @@
                             }
                         };
                         reader.readAsText(file);
-                        this.ClearSearch();
+                        this.Clear_Search();
+                    }
+                },
+                Save_LocalStrage() {
+                    localStorage.setItem("CustomerData", JSON.stringify(this.Customers));
+                },
+                Load_LocalStrage() {
+                    const storedData = localStorage.getItem("CustomerData");
+                    if (storedData) {
+                        this.Customers = JSON.parse(storedData);
                     }
                 },
             },
-            mounted() {
-                this.loadFromLocalStorage();
-                $(window).ready(() => { this.show_page = true; });
-            }
         })
-
     </script>
-    <!-- ▲ Script Content ▲ --------------------------------------------------------------------------->
-
-
 </body>
-<!-- ▲ Body ▲ ------------------------------------------------------------------------------------->
-
 
 </html>

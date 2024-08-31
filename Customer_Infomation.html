@@ -1,84 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-
-<!-- ▼ Head ▼ ------------------------------------------------------------------------------------->
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-
-    <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
-
-
-    <!-- ▼ Setting ▼ ---------------------------------------------------------------------------------->
-    <meta name="version" content="0.0.1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <!-- ▲ Setting ▲ ---------------------------------------------------------------------------------->
-
-
-    <!-- ▼ Reference ▼ -------------------------------------------------------------------------------->
-    <!-- Vue -->
+    <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-    <!-- CSS -->
     <link href="./Asset/CSS/Common_1.css" rel="stylesheet" />
-    <!-- ▲ Reference ▲ -------------------------------------------------------------------------------->
-
-
 </head>
-<!-- ▲ Head ▲ ------------------------------------------------------------------------------------->
-
-
-<!-- ▼ Body ▼ ------------------------------------------------------------------------------------->
 
 <body>
-
-
-    <!-- ▼ App ▼ -------------------------------------------------------------------------------------->
     <v-app id="app">
         <template>
+            <main-system-bar :drawer="Drawer" @change-drawer="Change_Drawer">
+                <v-icon>mdi-account-circle</v-icon>顧客情報
+            </main-system-bar>
 
+            <main-navigation :drawer="Drawer" @change-drawer="Change_Drawer"></main-navigation>
 
-            <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
-            <main-system-bar :drawer="drawer"
-                @change-drawer="Change_Drawer"><v-icon>mdi-account-circle</v-icon>顧客情報</main-system-bar>
-            <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
-
-
-            <!-- ▼ Navigation ▼ ------------------------------------------------------------------------------->
-            <main-navigation :drawer="drawer" @change-drawer="Change_Drawer"></main-navigation>
-            <!-- ▲ Navigation ▲ ------------------------------------------------------------------------------->
-
-
-            <!-- ▼ Main ▼ ------------------------------------------------------------------------------------->
             <v-main id="main">
                 <v-container id="main-container" class="d-flex flex-column pa-4" fluid fill-height
                     style="max-width: 100%;">
-
                     <transition name="fade-page">
-                        <div v-show="show_page">
-
-                            <template v-if="customer">
+                        <div v-show="Show_Page">
+                            <template v-if="Customer">
                                 <v-btn color="light-green lighten-3" class="mb-4"
-                                    :style="{ height: '48px', color: '#404040' }" @click="toggleEditMode">
-                                    <b>{{ editMode ? '編集を破棄' : '編集' }}</b>
+                                    :style="{ height: '48px', color: '#404040' }" @click="Toggle_Edit_Mode">
+                                    <b>{{ Edit_Mode ? '編集を破棄' : '編集' }}</b>
                                 </v-btn>
-
-                                <v-btn v-if="editMode" color="light-green lighten-3" class="mb-4 ml-4"
-                                    :style="{ height: '48px', color: '#404040' }" @click="openDatePicker">
+                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="Open_Date_Picker">
                                     <b>＋新しい診断日を追加</b>
                                 </v-btn>
-                                <v-dialog v-model="showDatePicker" max-width="290px">
+                                <v-dialog v-model="Show_Date_Picker" max-width="290px">
                                     <v-card>
                                         <v-card-title class="headline">診断日を選択</v-card-title>
                                         <v-card-text>
-                                            <v-date-picker v-model="newExamDate" full-width locale="ja-jp"
+                                            <v-date-picker v-model="New_Exam_Date" full-width locale="ja-jp"
                                                 :day-format="date => new Date(date).getDate()"
                                                 :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"
                                                 color="#4CAF50" header-color="#81C784"></v-date-picker>
@@ -86,54 +46,54 @@
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
                                             <v-btn color="blue darken-1" text
-                                                @click="showDatePicker = false">キャンセル</v-btn>
-                                            <v-btn color="blue darken-1" text @click="addNewExamDate">追加</v-btn>
+                                                @click="Show_Date_Picker = false">キャンセル</v-btn>
+                                            <v-btn color="blue darken-1" text @click="Add_New_Exam_Date">追加</v-btn>
                                         </v-card-actions>
                                     </v-card>
                                 </v-dialog>
-
-                                <v-btn v-if="editMode" color="light-green lighten-3" class="mb-4 ml-4"
-                                    :style="{ height: '48px', color: '#404040' }" @click="saveChanges">
+                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 ml-4"
+                                    :style="{ height: '48px', color: '#404040' }" @click="Save_Changes">
                                     <b>保存</b>
                                 </v-btn>
-
 
                                 <v-card class="customer-card">
                                     <v-card-title class="section-title d-flex">基本情報</v-card-title>
                                     <v-card-text>
                                         <v-row>
                                             <v-col>
-                                                <v-text-field v-model="customer.name" label="名前" :readonly="!editMode"
-                                                    :class="{ 'edited': editMode && customer.name !== originalCustomer.name }"></v-text-field>
+                                                <v-text-field v-model="Customer.name" label="名前" :readonly="!Edit_Mode"
+                                                    :class="{ 'edited': Edit_Mode && Customer.name !== Original_Customer.name }"></v-text-field>
                                             </v-col>
                                         </v-row>
+
                                         <v-row>
                                             <v-col>
-                                                <v-text-field v-model="customer.nameKana" label="カタカナ"
-                                                    :readonly="!editMode"
-                                                    :class="{ 'edited': editMode && customer.nameKana !== originalCustomer.nameKana }"></v-text-field>
+                                                <v-text-field v-model="Customer.nameKana" label="カタカナ"
+                                                    :readonly="!Edit_Mode"
+                                                    :class="{ 'edited': Edit_Mode && Customer.nameKana !== Original_Customer.nameKana }"></v-text-field>
                                             </v-col>
                                             <v-col>
-                                                <v-select v-model="customer.sex" :items="['男', '女', 'その他']" label="性別"
-                                                    :readonly="!editMode"
-                                                    :class="{ 'edited': editMode && customer.sex !== originalCustomer.sex }"></v-select>
+                                                <v-select v-model="Customer.sex" :items="['男', '女', 'その他']" label="性別"
+                                                    :readonly="!Edit_Mode"
+                                                    :class="{ 'edited': Edit_Mode && Customer.sex !== Original_Customer.sex }"></v-select>
                                             </v-col>
                                         </v-row>
+
                                         <v-row>
                                             <v-col>
-                                                <v-menu v-model="birthdayMenu" :close-on-content-click="false"
+                                                <v-menu v-model="Birthday_Menu" :close-on-content-click="false"
                                                     transition="scale-transition" offset-y max-width="290px"
-                                                    min-width="290px" :disabled="!editMode">
+                                                    min-width="290px" :disabled="!Edit_Mode">
                                                     <template v-slot:activator="{ on, attrs }">
-                                                        <v-text-field :value="formattedBirthday" label="生年月日" readonly
-                                                            v-bind="attrs" v-on="editMode ? on : {}"
-                                                            @click:append="editMode && (birthdayMenu = true)"
-                                                            :append-icon="editMode ? 'mdi-calendar' : ''"
-                                                            :class="{ 'edited': editMode && customer.birthday !== originalCustomer.birthday }">
+                                                        <v-text-field :value="Formatted_Birthday" label="生年月日" readonly
+                                                            v-bind="attrs" v-on="Edit_Mode ? on : {}"
+                                                            @click:append="Edit_Mode && (Birthday_Menu = true)"
+                                                            :append-icon="Edit_Mode ? 'mdi-calendar' : ''"
+                                                            :class="{ 'edited': Edit_Mode && Customer.birthday !== Original_Customer.birthday }">
                                                         </v-text-field>
                                                     </template>
-                                                    <v-date-picker v-if="editMode" v-model="customer.birthday"
-                                                        @input="birthdayMenu = false" locale="ja-jp"
+                                                    <v-date-picker v-if="Edit_Mode" v-model="Customer.birthday"
+                                                        @input="Birthday_Menu = false" locale="ja-jp"
                                                         :day-format="date => new Date(date).getDate()"
                                                         :header-date-format="date => new Date(date).toLocaleDateString('ja-JP', {year: 'numeric', month: 'long'})"
                                                         color="#4CAF50" header-color="#81C784">
@@ -141,33 +101,34 @@
                                                 </v-menu>
                                             </v-col>
                                             <v-col>
-                                                <v-text-field :value="calculateAge(customer.birthday)" label="年齢"
+                                                <v-text-field :value="Calculate_Age(Customer.birthday)" label="年齢"
                                                     readonly suffix="歳"></v-text-field>
                                             </v-col>
                                         </v-row>
+
                                         <v-row>
                                             <v-col>
-                                                <v-text-field v-model="customer.phone" label="電話番号"
-                                                    :readonly="!editMode"
-                                                    :class="{ 'edited': editMode && customer.phone !== originalCustomer.phone }"></v-text-field>
+                                                <v-text-field v-model="Customer.phone" label="電話番号"
+                                                    :readonly="!Edit_Mode"
+                                                    :class="{ 'edited': Edit_Mode && Customer.phone !== Original_Customer.phone }"></v-text-field>
                                             </v-col>
                                         </v-row>
+
                                         <v-textarea class="mt-8" outlined name="input-7-4" label="コメント"
-                                            v-model="customer.comment" :readonly="!editMode"
-                                            :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }"></v-textarea>
+                                            v-model="Customer.comment" :readonly="!Edit_Mode"
+                                            :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }"></v-textarea>
                                     </v-card-text>
                                 </v-card>
 
-
-                                <v-card class="customer-card" v-if="customer.data.length > 0">
+                                <v-card class="customer-card" v-if="Customer.data.length > 0">
                                     <v-card-title class="section-title d-flex align-center">
                                         <span class="white--text">診断日:</span>
-                                        <v-select v-model="selectedDataIndex"
-                                            :items="customer.data.map((d, index) => ({ text: d.date, value: index }))"
+                                        <v-select v-model="Selected_Data_Index"
+                                            :items="Customer.data.map((d, index) => ({ text: d.date, value: index }))"
                                             class="ml-4 date-select"
                                             style="max-width: 150px; padding-top: 20px;"></v-select>
                                         <v-spacer></v-spacer>
-                                        <v-btn v-if="editMode" color="error" @click="deleteExamDate(selectedDataIndex)">
+                                        <v-btn v-if="Edit_Mode" color="error" @click="Delete_Exam_Date(Selected_Data_Index)">
                                             診断データを削除
                                         </v-btn>
                                     </v-card-title>
@@ -175,14 +136,14 @@
                                         <v-card class="customer-card">
                                             <v-card-title class="section-title">頭皮の状態</v-card-title>
                                             <v-card-text>
-                                                <v-tabs v-model="activeTab" background-color="transparent" grow>
-                                                    <v-tab v-for="section in scalp_sections" :key="section">
+                                                <v-tabs v-model="Active_Tab" background-color="transparent" grow>
+                                                    <v-tab v-for="section in Scalp_Sections" :key="section">
                                                         {{ section }}
                                                     </v-tab>
                                                 </v-tabs>
-                                                <v-tabs-items v-model="activeTab">
-                                                    <v-tab-item v-for="section in scalp_sections" :key="section">
-                                                        <v-img :src="imageSrc" aspect-ratio="1"
+                                                <v-tabs-items v-model="Active_Tab">
+                                                    <v-tab-item v-for="section in Scalp_Sections" :key="section">
+                                                        <v-img :src="Image_Src" aspect-ratio="1"
                                                             class="scalp-image"></v-img>
                                                         <v-card flat>
                                                             <v-card-text>
@@ -193,16 +154,17 @@
                                                                         <v-col class="col-radio">普通</v-col>
                                                                         <v-col class="col-radio">注意</v-col>
                                                                     </v-row>
+
                                                                     <v-row align="center"
-                                                                        v-for="(item, key) in scalpItems" :key="key"
+                                                                        v-for="(item, key) in Scalp_Items" :key="key"
                                                                         style="margin-top: 0;">
                                                                         <v-col cols="3" class="col-radio"><b>{{
                                                                                 item }}</b></v-col>
                                                                         <v-col style="margin: 0; padding: 0;">
                                                                             <v-radio-group
-                                                                                v-model="selectedData.scalp[0][scalp_sections_map[section]][0][key]"
-                                                                                row :disabled="!editMode"
-                                                                                :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }">
+                                                                                v-model="Selected_Data.scalp[0][Scalp_Sections_Map[section]][0][key]"
+                                                                                row :disabled="!Edit_Mode"
+                                                                                :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }">
                                                                                 <v-col class="col-radio"><v-radio
                                                                                         class="custom-radio"
                                                                                         :value="1"></v-radio></v-col>
@@ -232,14 +194,15 @@
                                                     <v-col class="col-radio">なし</v-col>
                                                     <v-col class="col-radio">あり</v-col>
                                                 </v-row>
-                                                <v-row align="center" v-for="(item, key) in noteItems" :key="key"
+
+                                                <v-row align="center" v-for="(item, key) in Note_Items" :key="key"
                                                     style="margin-top: 0;">
                                                     <v-col cols="4" class="col-radio"><b>{{ item
                                                             }}</b></v-col>
                                                     <v-col style="margin: 0; padding: 0;">
-                                                        <v-radio-group v-model="selectedData.scalp[0].remarks[0][key]"
-                                                            row :disabled="!editMode"
-                                                            :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }">
+                                                        <v-radio-group v-model="Selected_Data.scalp[0].remarks[0][key]"
+                                                            row :disabled="!Edit_Mode"
+                                                            :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }">
                                                             <v-col class="col-radio"><v-radio :value="false"
                                                                     class="custom-radio"></v-radio></v-col>
                                                             <v-col class="col-radio"><v-radio :value="true"
@@ -257,21 +220,21 @@
                                         <v-card class="customer-card">
                                             <v-card-title class="section-title">毛髪の状態</v-card-title>
                                             <v-card-text class="mt-10">
-                                                <v-row v-for="(item, key) in hairItems" :key="key"
+                                                <v-row v-for="(item, key) in Hair_Items" :key="key"
                                                     class="d-flex flex-column">
                                                     <span class="status-item ml-4">{{ item }}</span>
                                                     <v-col style="padding-top: 0; padding-bottom: 0;">
-                                                        <v-radio-group v-model="selectedData.hair[0][key]" row
-                                                            style="margin-top: 0;" :disabled="!editMode"
-                                                            :class="{ 'edited': editMode && customer.comment !== originalCustomer.comment }">
+                                                        <v-radio-group v-model="Selected_Data.hair[0][key]" row
+                                                            style="margin-top: 0;" :disabled="!Edit_Mode"
+                                                            :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }">
                                                             <v-col class="col-radio"><v-radio class="custom-radio"
-                                                                    :label="hairLabels[key][1]"
+                                                                    :label="Hair_Labels[key][1]"
                                                                     :value="1"></v-radio></v-col>
                                                             <v-col class="col-radio"><v-radio class="custom-radio"
-                                                                    :label="hairLabels[key][2]"
+                                                                    :label="Hair_Labels[key][2]"
                                                                     :value="2"></v-radio></v-col>
                                                             <v-col class="col-radio"><v-radio class="custom-radio"
-                                                                    :label="hairLabels[key][3]"
+                                                                    :label="Hair_Labels[key][3]"
                                                                     :value="3"></v-radio></v-col>
                                                         </v-radio-group>
                                                     </v-col>
@@ -286,9 +249,8 @@
                                     </v-card-text>
                                 </v-card>
 
-
                                 <v-btn color="light-green lighten-3" class="ml-4"
-                                    :style="{ height: '48px', color: '#404040' }" @click="goBack"><b>戻る</b></v-btn>
+                                    :style="{ height: '48px', color: '#404040' }" @click="Go_Back"><b>戻る</b></v-btn>
                             </template>
                             <template v-else>
                                 <v-card>
@@ -300,21 +262,12 @@
 
                         </div>
                     </transition>
-
-
                 </v-container>
             </v-main>
-            <!-- ▲ Main ▲ ------------------------------------------------------------------------------------->
-
-
         </template>
     </v-app>
-    <!-- ▲ App ▲ -------------------------------------------------------------------------------------->
 
-
-    <!-- ▼ Style ▼ ------------------------------------------------------------------------------------>
     <style>
-        /* Fade */
         .fade-page-enter-active,
         .fade-page-leave-active {
             transition: opacity 2s;
@@ -373,12 +326,10 @@
             background-color: #E8F5E9 !important;
         }
 
-
         .edited {
             background-color: rgba(216, 238, 221, 0.3) !important;
         }
 
-        /* Data Picker */
         .v-date-picker-header {
             background-color: #81C784 !important;
             color: white !important;
@@ -405,225 +356,215 @@
             color: white !important;
         }
     </style>
-    <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
 
-
-    <!-- ▼ Script Reference ▼ ------------------------------------------------------------------------->
-    <!-- Main -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/lang/ja.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vector-js@4.1.1/dist/vector.min.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <!-- Compornent -->
-    <script src="./Asset/Javascript/common.js"></script>
     <script src="./Asset/Javascript/main-system-bar.js"></script>
     <script src="./Asset/Javascript/main-navigation.js"></script>
-    <!-- ▲ Script Reference ▲ ------------------------------------------------------------------------->
 
-
-    <!-- ▼ Script Content ▼ --------------------------------------------------------------------------->
     <script>
-
-
-        // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
             vuetify: new Vuetify({}),
             data: {
-                drawer: false,
-                show_page: false,
-
-                customer: null,
-                activeTab: null,
-                scalp_sections: ['トップ', 'サイド', 'バック', 'ネープ'],
-                scalp_sections_map: {
+                Drawer: false,
+                Show_Page: false,
+                Customer: null,
+                Active_Tab: null,
+                Scalp_Sections: ['トップ', 'サイド', 'バック', 'ネープ'],
+                Scalp_Sections_Map: {
                     'トップ': 'top',
                     'サイド': 'side',
                     'バック': 'back',
                     'ネープ': 'nape'
                 },
-                scalpItems: {
-                    redness: '赤み',
-                    keratin: '角質',
-                    dryness: '乾燥',
-                    oiliness: '油分',
-                    pores: '毛穴',
-                    hair_loss: '抜け毛',
-                    itching: 'かゆみ'
+                Scalp_Items: {
+                    Redness: '赤み',
+                    Keratin: '角質',
+                    Dryness: '乾燥',
+                    Oiliness: '油分',
+                    Pores: '毛穴',
+                    Hair_Loss: '抜け毛',
+                    Itching: 'かゆみ'
                 },
-                hairItems: {
-                    luster: 'ツヤ',
-                    thickness: '太さ',
-                    shape: '形状',
-                    hardness: '硬さ',
-                    elasticity: '弾力'
+                Hair_Items: {
+                    Luster: 'ツヤ',
+                    Thickness: '太さ',
+                    Shape: '形状',
+                    Hardness: '硬さ',
+                    Elasticity: '弾力'
                 },
-                noteItems: {
-                    swelling: '腫れ',
-                    eczema: '湿疹',
-                    inflammation: '炎症',
-                    scars: '傷',
-                    atopic_dermatitis: 'アトピー',
-                    pain: '痛み'
+                Note_Items: {
+                    Swelling: '腫れ',
+                    Eczema: '湿疹',
+                    Inflammation: '炎症',
+                    Scars: '傷',
+                    Atopic_Dermatitis: 'アトピー',
+                    Pain: '痛み'
                 },
-                hairLabels: {
-                    luster: { 1: 'なし', 2: '普通', 3: 'あり' },
-                    thickness: { 1: '細', 2: '普通', 3: '太' },
-                    shape: { 1: '直毛', 2: '普通', 3: '癖毛' },
-                    hardness: { 1: '柔', 2: '普通', 3: '硬' },
-                    elasticity: { 1: '弱', 2: '普通', 3: '強' }
+                Hair_Labels: {
+                    Luster: { 1: 'なし', 2: '普通', 3: 'あり' },
+                    Thickness: { 1: '細', 2: '普通', 3: '太' },
+                    Shape: { 1: '直毛', 2: '普通', 3: '癖毛' },
+                    Hardness: { 1: '柔', 2: '普通', 3: '硬' },
+                    Elasticity: { 1: '弱', 2: '普通', 3: '強' }
                 },
-
-                editMode: false,
-                originalCustomer: null,
-
-                newExamDate: null,
-                showDatePicker: false,
-
-                birthdayMenu: false,
-
-                selectedDataIndex: 0,
-
-                imageSrc: './Asset/Image/Test_1.png',
+                Edit_Mode: false,
+                Original_Customer: null,
+                New_Exam_Date: null,
+                Show_Date_Picker: false,
+                Birthday_Menu: false,
+                Selected_Data_Index: 0,
+                Image_Src: './Asset/Image/Test_1.png',
+            },
+            watch: {
+                Selected_Data_Index() {
+                    this.Get_Image_Src();
+                },
+                Active_Tab() {
+                    this.Get_Image_Src();
+                }
             },
             computed: {
-                selectedData() {
-                    return this.customer && this.customer.data.length > 0
-                        ? this.customer.data[this.selectedDataIndex]
+                Selected_Data() {
+                    return this.Customer && this.Customer.data.length > 0
+                        ? this.Customer.data[this.Selected_Data_Index]
                         : null;
                 },
-                isDataEdited() {
-                    return JSON.stringify(this.customer) !== JSON.stringify(this.originalCustomer);
+                Is_Data_Edited() {
+                    return JSON.stringify(this.Customer) !== JSON.stringify(this.Original_Customer);
                 },
-                formattedBirthday() {
-                    if (!this.customer.birthday) return '';
-                    const [year, month, day] = this.customer.birthday.split('-');
+                Formatted_Birthday() {
+                    if (!this.Customer.birthday) return '';
+                    const [year, month, day] = this.Customer.birthday.split('-');
                     return `${year}/${month}/${day}`;
                 },
             },
-            watch: {
-                selectedDataIndex() {
-                    this.getImageSrc();
-                },
-                activeTab() {
-                    this.getImageSrc();
+            mounted() {
+                $(window).ready(() => { this.Show_Page = true; });
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const Customer_Id = urlParams.get('id');
+                const Customers = JSON.parse(localStorage.getItem("CustomerData"));
+                this.Customer = Customers.find(c => c.id === parseInt(Customer_Id));
+
+                if (!this.Customer) {
+                    console.error('Customer not found');
+                    return;
                 }
+
+                this.Customer.data = this.Customer.data.map(Data => {
+                    if (!this.Is_Valid_Exam_Data(Data)) {
+                        return this.Create_New_Exam_Data(Data.date);
+                    }
+                    return Data;
+                });
+
+                this.Customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                this.Selected_Data_Index = 0;
+                this.Get_Image_Src();
             },
             methods: {
-                // System
                 Change_Drawer(_value) {
-                    this.drawer = _value;
+                    this.Drawer = _value;
                 },
-                goBack() {
+                Go_Back() {
                     window.history.back();
                 },
-                changeScalpStatus(section, key) {
-                    let englishSection = this.scalp_sections_map[section];
-                    let currentValue = this.selectedData.scalp[0][englishSection][0][key];
-                    this.selectedData.scalp[0][englishSection][0][key] = (currentValue % 3) + 1;
+                Change_Scalp_Status(Section, Key) {
+                    let English_Section = this.Scalp_Sections_Map[Section];
+                    let Current_Value = this.Selected_Data.scalp[0][English_Section][0][Key];
+                    this.Selected_Data.scalp[0][English_Section][0][Key] = (Current_Value % 3) + 1;
                 },
-                changeHairStatus(key) {
-                    let currentValue = this.selectedData.hair[0][key];
-                    this.selectedData.hair[0][key] = (currentValue % 3) + 1;
+                Change_Hair_Status(Key) {
+                    let Current_Value = this.Selected_Data.hair[0][Key];
+                    this.Selected_Data.hair[0][Key] = (Current_Value % 3) + 1;
                 },
-
-                calculateAge(birthday) {
-                    const birthDate = new Date(birthday);
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const monthDiff = today.getMonth() - birthDate.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                        age--;
+                Calculate_Age(Birthday) {
+                    const Birth_Date = new Date(Birthday);
+                    const Today = new Date();
+                    let Age = Today.getFullYear() - Birth_Date.getFullYear();
+                    const Month_Diff = Today.getMonth() - Birth_Date.getMonth();
+                    if (Month_Diff < 0 || (Month_Diff === 0 && Today.getDate() < Birth_Date.getDate())) {
+                        Age--;
                     }
-                    return age;
+                    return Age;
                 },
-
-                getImageSrc() {
-                    if (!this.customer || !this.selectedData || this.activeTab === null) {
-                        this.imageSrc = './Asset/Image/Test_1.png';
+                Get_Image_Src() {
+                    if (!this.Customer || !this.Selected_Data || this.Active_Tab === null) {
+                        this.Image_Src = './Asset/Image/Test_1.png';
                         return;
                     }
 
-                    const customerName = this.customer.name;
-                    const examDate = this.formatDate(this.selectedData.date);
-                    const activeSection = this.scalp_sections[this.activeTab];
-
-                    const imagePath = `./Asset/Image/${customerName}_${examDate}_${activeSection}.png`;
-
-                    // 画像の存在確認
-                    const img = new Image();
-                    img.onload = () => {
-                        this.imageSrc = imagePath;
+                    const Customer_Name = this.Customer.name;
+                    const Exam_Date = this.Format_Date(this.Selected_Data.date);
+                    const Active_Section = this.Scalp_Sections[this.Active_Tab];
+                    const Image_Path = `./Asset/Image/${Customer_Name}_${Exam_Date}_${Active_Section}.png`;
+                    const Img = new Image();
+                    Img.onload = () => {
+                        this.Image_Src = Image_Path;
                     };
-                    img.onerror = () => {
-                        this.imageSrc = './Asset/Image/Test_1.png';
+                    Img.onerror = () => {
+                        this.Image_Src = './Asset/Image/Test_1.png';
                     };
-                    img.src = imagePath;
+                    Img.src = Image_Path;
                 },
-
-                formatDate(dateString) {
-                    const date = new Date(dateString);
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    return `${year}${month}${day}`;
+                Format_Date(Date_String) {
+                    const Date = new Date(Date_String);
+                    const Year = Date.getFullYear();
+                    const Month = String(Date.getMonth() + 1).padStart(2, '0');
+                    const Day = String(Date.getDate()).padStart(2, '0');
+                    return `${Year}${Month}${Day}`;
                 },
-
-                resetCustomerData() {
-                    if (this.originalCustomer) {
-                        this.customer = JSON.parse(JSON.stringify(this.originalCustomer));
-                        if (this.customer.data.length > 0) {
-                            this.selectedDataIndex = this.customer.data.length - 1;
+                Reset_Customer_Data() {
+                    if (this.Original_Customer) {
+                        this.Customer = JSON.parse(JSON.stringify(this.Original_Customer));
+                        if (this.Customer.data.length > 0) {
+                            this.Selected_Data_Index = this.Customer.data.length - 1;
                         } else {
-                            this.selectedDataIndex = null;
+                            this.Selected_Data_Index = null;
                         }
                     }
                 },
-                toggleEditMode() {
-                    if (this.editMode) {
-                        if (this.isDataEdited) {
+                Toggle_Edit_Mode() {
+                    if (this.Edit_Mode) {
+                        if (this.Is_Data_Edited) {
                             if (confirm('変更を破棄しますか？')) {
-                                this.customer = JSON.parse(JSON.stringify(this.originalCustomer));
-                                this.selectedDataIndex = 0;
+                                this.Customer = JSON.parse(JSON.stringify(this.Original_Customer));
+                                this.Selected_Data_Index = 0;
                             } else {
                                 return;
                             }
                         }
                     } else {
-                        this.originalCustomer = JSON.parse(JSON.stringify(this.customer));
+                        this.Original_Customer = JSON.parse(JSON.stringify(this.Customer));
                     }
-                    this.editMode = !this.editMode;
+                    this.Edit_Mode = !this.Edit_Mode;
                 },
-
-                saveChanges() {
-                    if (this.isDataEdited) {
-
-                        let customers = JSON.parse(localStorage.getItem("CustomerData"));
-
-                        let index = customers.findIndex(c => c.id === this.customer.id);
-                        customers[index] = this.customer;
-                        localStorage.setItem("CustomerData", JSON.stringify(customers));
-
-                        // Export
-                        let dataStr = JSON.stringify(customers, null, 2);
-                        let dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-                        let exportFileDefaultName = 'all_customers_data.json';
-                        let linkElement = document.createElement('a');
-                        linkElement.setAttribute('href', dataUri);
-                        linkElement.setAttribute('download', exportFileDefaultName);
-                        linkElement.click();
-
-                        this.editMode = false;
-                        this.originalCustomer = JSON.parse(JSON.stringify(this.customer));
+                Save_Changes() {
+                    if (this.Is_Data_Edited) {
+                        let Customers = JSON.parse(localStorage.getItem("CustomerData"));
+                        let Index = Customers.findIndex(c => c.id === this.Customer.id);
+                        Customers[Index] = this.Customer;
+                        localStorage.setItem("CustomerData", JSON.stringify(Customers));
+                        let Data_Str = JSON.stringify(Customers, null, 2);
+                        let Data_Uri = 'data:application/json;charset=utf-8,' + encodeURIComponent(Data_Str);
+                        let Export_File_Default_Name = 'all_customers_data.json';
+                        let Link_Element = document.createElement('a');
+                        Link_Element.setAttribute('href', Data_Uri);
+                        Link_Element.setAttribute('download', Export_File_Default_Name);
+                        Link_Element.click();
+                        this.Edit_Mode = false;
+                        this.Original_Customer = JSON.parse(JSON.stringify(this.Customer));
                         alert('変更が保存され、顧客情報がエクスポートされました。');
                     }
                 },
-
-                createNewExamData(date) {
-                    const newData = {
-                        date: date,
+                Create_New_Exam_Data(Date) {
+                    const New_Data = {
+                        date: Date,
                         scalp: [
                             {
                                 top: [{}],
@@ -635,108 +576,77 @@
                         ],
                         hair: [{}]
                     };
-
-                    for (let section in this.scalp_sections_map) {
-                        let englishSection = this.scalp_sections_map[section];
-                        newData.scalp[0][englishSection][0] = {};
-                        for (let item in this.scalpItems) {
-                            newData.scalp[0][englishSection][0][item] = 1;
+                    for (let Section in this.Scalp_Sections_Map) {
+                        let English_Section = this.Scalp_Sections_Map[Section];
+                        New_Data.scalp[0][English_Section][0] = {};
+                        for (let Item in this.Scalp_Items) {
+                            New_Data.scalp[0][English_Section][0][Item] = 1;
                         }
                     }
-
-                    for (let item in this.noteItems) {
-                        newData.scalp[0].remarks[0][item] = false;
+                    for (let Item in this.Note_Items) {
+                        New_Data.scalp[0].remarks[0][Item] = false;
+                    }
+                    for (let Item in this.Hair_Items) {
+                        New_Data.hair[0][Item] = 1;
                     }
 
-                    for (let item in this.hairItems) {
-                        newData.hair[0][item] = 1;
-                    }
-
-                    return newData;
+                    return New_Data;
                 },
-                addNewExamDate() {
-                    if (!this.newExamDate) {
+                Add_New_Exam_Date() {
+                    if (!this.New_Exam_Date) {
                         alert('診断日を選択してください。');
                         return;
                     }
 
-                    const formattedDate = new Date(this.newExamDate).toISOString().split('T')[0];
+                    const Formatted_Date = new Date(this.New_Exam_Date).toISOString().split('T')[0];
 
-                    if (this.customer.data.some(d => d.date === formattedDate)) {
+                    if (this.Customer.data.some(d => d.date === Formatted_Date)) {
                         alert('この日付の診断データは既に存在します。');
                         return;
                     }
 
-                    const newData = this.createNewExamData(formattedDate);
+                    const New_Data = this.Create_New_Exam_Data(Formatted_Date);
 
-                    this.customer.data.push(newData);
-                    this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    this.selectedDataIndex = this.customer.data.findIndex(d => d.date === formattedDate);
-                    this.showDatePicker = false;
-                    this.newExamDate = null;
+                    this.Customer.data.push(New_Data);
+                    this.Customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    this.Selected_Data_Index = this.Customer.data.findIndex(d => d.date === Formatted_Date);
+                    this.Show_Date_Picker = false;
+                    this.New_Exam_Date = null;
                 },
-                deleteExamDate(index) {
+                Delete_Exam_Date(Index) {
                     if (confirm('この診断データを削除してもよろしいですか？')) {
-                        this.customer.data.splice(index, 1);
-                        if (this.customer.data.length > 0) {
-                            this.selectedDataIndex = 0;
+                        this.Customer.data.splice(Index, 1);
+                        if (this.Customer.data.length > 0) {
+                            this.Selected_Data_Index = 0;
                         } else {
-                            this.selectedDataIndex = null;
+                            this.Selected_Data_Index = null;
                         }
                     }
                 },
-                isValidExamData(data) {
-                    if (!data.scalp || !data.hair) return false;
+                Is_Valid_Exam_Data(Data) {
+                    if (!Data.scalp || !Data.hair) return false;
 
-                    for (let section in this.scalp_sections_map) {
-                        let englishSection = this.scalp_sections_map[section];
-                        if (!data.scalp[0][englishSection] || !data.scalp[0][englishSection][0]) return false;
-                        for (let item in this.scalpItems) {
-                            if (typeof data.scalp[0][englishSection][0][item] !== 'number') return false;
+                    for (let Section in this.Scalp_Sections_Map) {
+                        let English_Section = this.Scalp_Sections_Map[Section];
+                        if (!Data.scalp[0][English_Section] || !Data.scalp[0][English_Section][0]) return false;
+                        for (let Item in this.Scalp_Items) {
+                            if (typeof Data.scalp[0][English_Section][0][Item] !== 'number') return false;
                         }
                     }
 
-                    for (let item in this.noteItems) {
-                        if (typeof data.scalp[0].remarks[0][item] !== 'boolean') return false;
+                    for (let Item in this.Note_Items) {
+                        if (typeof Data.scalp[0].remarks[0][Item] !== 'boolean') return false;
                     }
 
-                    for (let item in this.hairItems) {
-                        if (typeof data.hair[0][item] !== 'number') return false;
+                    for (let Item in this.Hair_Items) {
+                        if (typeof Data.hair[0][Item] !== 'number') return false;
                     }
 
                     return true;
                 },
-
-                openDatePicker() {
-                    this.showDatePicker = true;
+                Open_Date_Picker() {
+                    this.Show_Date_Picker = true;
                 },
-            },
-            mounted() {
-                $(window).ready(() => { this.show_page = true; });
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const customerId = urlParams.get('id');
-                const customers = JSON.parse(localStorage.getItem("CustomerData"));
-                this.customer = customers.find(c => c.id === parseInt(customerId));
-
-                if (!this.customer) {
-                    console.error('Customer not found');
-                    return;
-                }
-
-                // Ensure all exam data have the correct structure
-                this.customer.data = this.customer.data.map(data => {
-                    if (!this.isValidExamData(data)) {
-                        return this.createNewExamData(data.date);
-                    }
-                    return data;
-                });
-
-                // Sort data by date in descending order
-                this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                this.selectedDataIndex = 0;
-
-                this.getImageSrc();
             },
         });
 
