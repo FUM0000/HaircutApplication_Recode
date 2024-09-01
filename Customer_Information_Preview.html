@@ -116,6 +116,11 @@
         }
 
         @media print {
+            @page {
+                margin: 0;
+                size: A4;
+            }
+
             body {
                 width: 210mm;
                 height: 297mm;
@@ -124,7 +129,7 @@
             .page {
                 page-break-after: always;
             }
-            
+
             .back-button {
                 display: none;
             }
