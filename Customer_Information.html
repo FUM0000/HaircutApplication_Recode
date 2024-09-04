@@ -386,35 +386,35 @@
                     'ネープ': 'nape'
                 },
                 Scalp_Items: {
-                    Redness: '赤み',
-                    Keratin: '角質',
-                    Dryness: '乾燥',
-                    Oiliness: '油分',
-                    Pores: '毛穴',
-                    Hair_Loss: '抜け毛',
-                    Itching: 'かゆみ'
+                    redness: '赤み',
+                    keratin: '角質',
+                    dryness: '乾燥',
+                    oiliness: '油分',
+                    pores: '毛穴',
+                    hair_loss: '抜け毛',
+                    itching: 'かゆみ'
                 },
                 Hair_Items: {
-                    Luster: 'ツヤ',
-                    Thickness: '太さ',
-                    Shape: '形状',
-                    Hardness: '硬さ',
-                    Elasticity: '弾力'
+                    luster: 'ツヤ',
+                    thickness: '太さ',
+                    shape: '形状',
+                    hardness: '硬さ',
+                    elasticity: '弾力'
                 },
                 Note_Items: {
-                    Swelling: '腫れ',
-                    Eczema: '湿疹',
-                    Inflammation: '炎症',
-                    Scars: '傷',
-                    Atopic_Dermatitis: 'アトピー',
-                    Pain: '痛み'
+                    swelling: '腫れ',
+                    eczema: '湿疹',
+                    inflammation: '炎症',
+                    scars: '傷',
+                    atopic_dermatitis: 'アトピー',
+                    pain: '痛み'
                 },
                 Hair_Labels: {
-                    Luster: { 1: 'なし', 2: '普通', 3: 'あり' },
-                    Thickness: { 1: '細', 2: '普通', 3: '太' },
-                    Shape: { 1: '直毛', 2: '普通', 3: '癖毛' },
-                    Hardness: { 1: '柔', 2: '普通', 3: '硬' },
-                    Elasticity: { 1: '弱', 2: '普通', 3: '強' }
+                    luster: { 1: 'なし', 2: '普通', 3: 'あり' },
+                    thickness: { 1: '細', 2: '普通', 3: '太' },
+                    shape: { 1: '直毛', 2: '普通', 3: '癖毛' },
+                    hardness: { 1: '柔', 2: '普通', 3: '硬' },
+                    elasticity: { 1: '弱', 2: '普通', 3: '強' }
                 },
                 Edit_Mode: false,
                 Original_Customer: null,
@@ -653,7 +653,7 @@
                 },
                 Open_Print_Preview() {
                     const customerId = new URLSearchParams(window.location.search).get('id');
-                    window.open(`Customer_Information_Preview.html?id=${customerId}?date_index=${this.Selected_Data_Index}`, '_blank');
+                    window.open(`Customer_Information_Preview.html?id=${customerId}&date_index=${this.Selected_Data_Index}`, '_blank');
                 },
             },
         });

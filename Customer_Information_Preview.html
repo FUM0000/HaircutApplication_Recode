@@ -43,9 +43,9 @@
                 <img src="./Asset/Image/Test_1.png" alt="Test Image 2">
             </div>
 
-            <template v-for="(data, dataIndex) in customer.data">
+            <div v-if="selectedData">
                 <div class="page">
-                    <h2>診断日: {{ data.date }}</h2>
+                    <h2>診断日: {{ selectedData.date }}</h2>
 
                     <div class="marginleft">
                         <h3 class="margintop">頭皮備考</h3>
@@ -57,8 +57,9 @@
                                 </tr>
                                 <tr v-for="(item, key) in noteItems">
                                     <td>{{ item }}</td>
-                                    <td :class="data.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
-                                        {{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
+                                    <td
+                                        :class="selectedData.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
+                                        {{ selectedData.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
                                     </td>
                                 </tr>
                             </table>
@@ -74,14 +75,13 @@
                                 <tr v-for="(item, key) in hairItems">
                                     <td>{{ item }}</td>
                                     <td>
-                                        {{ getHairStatusText(key, data.hair[0][key]) }}
+                                        {{ getHairStatusText(key, selectedData.hair[0][key]) }}
                                     </td>
                                 </tr>
                             </table>
                         </div>
                     </div>
                 </div>
-
 
                 <div class="page">
                     <h3 class="margintop">頭皮の状態(トップ、サイド)</h3>
@@ -95,13 +95,13 @@
                                 </tr>
                                 <tr v-for="(item, key) in scalpItems">
                                     <td>{{ item }}</td>
-                                    <td :class="getStatusClass(data.scalp[0][section][0][key])">
-                                        {{ getStatusText(data.scalp[0][section][0][key]) }}
+                                    <td :class="getStatusClass(selectedData.scalp[0][section][0][key])">
+                                        {{ getStatusText(selectedData.scalp[0][section][0][key]) }}
                                     </td>
                                 </tr>
                             </table>
                             <div class="scalp-image">
-                                <img :src="getImageSrc(customer.name, data.date, section)"
+                                <img :src="getImageSrc(customer.name, selectedData.date, section)"
                                     :alt="getSectionName(section)">
                             </div>
                         </div>
@@ -120,19 +120,19 @@
                                 </tr>
                                 <tr v-for="(item, key) in scalpItems">
                                     <td>{{ item }}</td>
-                                    <td :class="getStatusClass(data.scalp[0][section][0][key])">
-                                        {{ getStatusText(data.scalp[0][section][0][key]) }}
+                                    <td :class="getStatusClass(selectedData.scalp[0][section][0][key])">
+                                        {{ getStatusText(selectedData.scalp[0][section][0][key]) }}
                                     </td>
                                 </tr>
                             </table>
                             <div class="scalp-image">
-                                <img :src="getImageSrc(customer.name, data.date, section)"
+                                <img :src="getImageSrc(customer.name, selectedData.date, section)"
                                     :alt="getSectionName(section)">
                             </div>
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
         </div>
     </div>
 
@@ -286,6 +286,7 @@
             el: '#app',
             data: {
                 customer: null,
+                selectedData: null,
                 scalpItems: {
                     redness: '赤み',
                     keratin: '角質',
@@ -332,6 +333,12 @@
                 }
 
                 this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                if (customer_date_index !== null && this.customer.data[customer_date_index]) {
+                    this.selectedData = this.customer.data[customer_date_index];
+                } else {
+                    console.error('Invalid date index or no data for the specified index');
+                }
             },
             methods: {
                 calculateAge(birthday) {
@@ -362,6 +369,8 @@
                     return statusClasses[value] || '';
                 },
                 getHairStatusText(key, value) {
+                    console.log(key);
+                    console.log(this.selectedData.hair[0]);
                     return this.hairLabels[key][value];
                 },
                 getImageSrc(customerName, examDate, section) {
