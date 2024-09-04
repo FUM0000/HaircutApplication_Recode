@@ -5,135 +5,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>顧客情報プレビュー</title>
-    <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <v-app id="app">
-        <template>
-            <v-main id="main">
-                <v-btn class="back-button" @click="goBack">戻る</v-btn>
+    <div id="app">
+        <button class="back-button" onclick="goBack()">戻る</button>
+        <div class="page">
+            <h1>顧客情報</h1>
+            <div id="basic-info">
+                <table>
+                    <tr>
+                        <th>名前</th>
+                        <td>{{ customer.name }}</td>
+                        <th>カタカナ</th>
+                        <td>{{ customer.nameKana }}</td>
+                    </tr>
+                    <tr>
+                        <th>性別</th>
+                        <td>{{ customer.sex }}</td>
+                        <th>生年月日</th>
+                        <td>{{ customer.birthday }}</td>
+                    </tr>
+                    <tr>
+                        <th>年齢</th>
+                        <td>{{ calculateAge(customer.birthday) }}歳</td>
+                        <th>電話番号</th>
+                        <td>{{ customer.phone }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <h2>コメント</h2>
+            <p>{{ customer.comment }}</p>
+
+            <template v-for="(data, dataIndex) in customer.data">
                 <div class="page">
-                    <h1>顧客情報</h1>
-                    <div id="basic-info">
+                    <h2>診断日: {{ data.date }}</h2>
+
+                    <h3>頭皮備考</h3>
+                    <div class="content-wrapper">
                         <table>
                             <tr>
-                                <th>名前</th>
-                                <td>{{ customer.name }}</td>
-                                <th>カタカナ</th>
-                                <td>{{ customer.nameKana }}</td>
+                                <th>項目</th>
+                                <th>状態</th>
                             </tr>
-                            <tr>
-                                <th>性別</th>
-                                <td>{{ customer.sex }}</td>
-                                <th>生年月日</th>
-                                <td>{{ customer.birthday }}</td>
-                            </tr>
-                            <tr>
-                                <th>年齢</th>
-                                <td>{{ calculateAge(customer.birthday) }}歳</td>
-                                <th>電話番号</th>
-                                <td>{{ customer.phone }}</td>
+                            <tr v-for="(item, key) in noteItems">
+                                <td>{{ item }}</td>
+                                <td :class="data.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
+                                    {{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
+                                </td>
                             </tr>
                         </table>
                     </div>
 
-                    <h2>コメント</h2>
-                    <p>{{ customer.comment }}</p>
-
-                    <template v-for="(data, dataIndex) in customer.data">
-                        <div class="page">
-                            <h2>診断日: {{ data.date }}</h2>
-
-                            <h3>頭皮備考</h3>
-                            <div class="content-wrapper">
-                                <table>
-                                    <tr>
-                                        <th>項目</th>
-                                        <th>状態</th>
-                                    </tr>
-                                    <tr v-for="(item, key) in noteItems">
-                                        <td>{{ item }}</td>
-                                        <td :class="data.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
-                                            {{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <h3>毛髪の状態</h3>
-                            <div class="content-wrapper">
-                                <table id="hair-status">
-                                    <tr>
-                                        <th>項目　　</th>
-                                        <th>状態</th>
-                                    </tr>
-                                    <tr v-for="(item, key) in hairItems">
-                                        <td>{{ item }}</td>
-                                        <td>
-                                            {{ getHairStatusText(key, data.hair[0][key]) }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
+                    <h3>毛髪の状態</h3>
+                    <div class="content-wrapper">
+                        <table id="hair-status">
+                            <tr>
+                                <th>項目　　</th>
+                                <th>状態</th>
+                            </tr>
+                            <tr v-for="(item, key) in hairItems">
+                                <td>{{ item }}</td>
+                                <td>
+                                    {{ getHairStatusText(key, data.hair[0][key]) }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
 
 
-                        <div class="page">
-                            <h3>頭皮の状態(トップ、サイド)</h3>
-                            <div v-for="section in ['top', 'side']">
-                                <h4>{{ getSectionName(section) }}</h4>
-                                <div class="content-wrapper">
-                                    <table>
-                                        <tr>
-                                            <th>項目</th>
-                                            <th>状態</th>
-                                        </tr>
-                                        <tr v-for="(item, key) in scalpItems">
-                                            <td>{{ item }}</td>
-                                            <td :class="getStatusClass(data.scalp[0][section][0][key])">
-                                                {{ getStatusText(data.scalp[0][section][0][key]) }}
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <div class="scalp-image">
-                                        <img :src="getImageSrc(customer.name, data.date, section)"
-                                            :alt="getSectionName(section)">
-                                    </div>
-                                </div>
+                <div class="page">
+                    <h3>頭皮の状態(トップ、サイド)</h3>
+                    <div v-for="section in ['top', 'side']">
+                        <h4>{{ getSectionName(section) }}</h4>
+                        <div class="content-wrapper">
+                            <table>
+                                <tr>
+                                    <th>項目</th>
+                                    <th>状態</th>
+                                </tr>
+                                <tr v-for="(item, key) in scalpItems">
+                                    <td>{{ item }}</td>
+                                    <td :class="getStatusClass(data.scalp[0][section][0][key])">
+                                        {{ getStatusText(data.scalp[0][section][0][key]) }}
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="scalp-image">
+                                <img :src="getImageSrc(customer.name, data.date, section)"
+                                    :alt="getSectionName(section)">
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="page">
-                            <h3>頭皮の状態(バック、ネープ)</h3>
-                            <div v-for="section in ['back', 'nape']">
-                                <h4>{{ getSectionName(section) }}</h4>
-                                <div class="content-wrapper">
-                                    <table>
-                                        <tr>
-                                            <th>項目</th>
-                                            <th>状態</th>
-                                        </tr>
-                                        <tr v-for="(item, key) in scalpItems">
-                                            <td>{{ item }}</td>
-                                            <td :class="getStatusClass(data.scalp[0][section][0][key])">
-                                                {{ getStatusText(data.scalp[0][section][0][key]) }}
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <div class="scalp-image">
-                                        <img :src="getImageSrc(customer.name, data.date, section)"
-                                            :alt="getSectionName(section)">
-                                    </div>
-                                </div>
+                <div class="page">
+                    <h3>頭皮の状態(バック、ネープ)</h3>
+                    <div v-for="section in ['back', 'nape']">
+                        <h4>{{ getSectionName(section) }}</h4>
+                        <div class="content-wrapper">
+                            <table>
+                                <tr>
+                                    <th>項目</th>
+                                    <th>状態</th>
+                                </tr>
+                                <tr v-for="(item, key) in scalpItems">
+                                    <td>{{ item }}</td>
+                                    <td :class="getStatusClass(data.scalp[0][section][0][key])">
+                                        {{ getStatusText(data.scalp[0][section][0][key]) }}
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="scalp-image">
+                                <img :src="getImageSrc(customer.name, data.date, section)"
+                                    :alt="getSectionName(section)">
                             </div>
                         </div>
-                    </template>
-            </v-main>
-        </template>
-    </v-app>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
 
     <style>
         body {
@@ -261,15 +256,14 @@
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/lang/ja.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-
     <script>
+        function goBack() {
+            const customerId = new URLSearchParams(window.location.search).get('id');
+            window.location.href = `Customer_Information.html?id=${customerId}`;
+        }
 
         new Vue({
             el: '#app',
-            vuetify: new Vuetify({}),
             data: {
                 customer: null,
                 scalpItems: {
@@ -319,10 +313,6 @@
                 this.customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
             },
             methods: {
-                goBack() {
-                    const customerId = new URLSearchParams(window.location.search).get('id');
-                    window.location.href = `Customer_Information.html?id=${customerId}`;
-                },
                 calculateAge(birthday) {
                     const birthDate = new Date(birthday);
                     const today = new Date();
