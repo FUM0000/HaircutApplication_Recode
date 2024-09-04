@@ -12,7 +12,7 @@
     <div id="app">
         <button class="back-button" onclick="goBack()">戻る</button>
         <div class="page">
-            <h1>顧客情報</h1>
+            <h1>お客様情報</h1>
             <div id="basic-info">
                 <table>
                     <tr>
@@ -37,48 +37,55 @@
             </div>
 
             <h2>コメント</h2>
-            <p>{{ customer.comment }}</p>
+            <p id="comment">{{ customer.comment }}</p>
+
+            <div class="images">
+                <img src="./Asset/Image/Test_1.png" alt="Test Image 1">
+                <img src="./Asset/Image/Test_1.png" alt="Test Image 2">
+            </div>
 
             <template v-for="(data, dataIndex) in customer.data">
                 <div class="page">
                     <h2>診断日: {{ data.date }}</h2>
 
-                    <h3>頭皮備考</h3>
-                    <div class="content-wrapper">
-                        <table>
-                            <tr>
-                                <th>項目</th>
-                                <th>状態</th>
-                            </tr>
-                            <tr v-for="(item, key) in noteItems">
-                                <td>{{ item }}</td>
-                                <td :class="data.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
-                                    {{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <div class="marginleft">
+                        <h3 class="margintop">頭皮備考</h3>
+                        <div class="content-wrapper">
+                            <table>
+                                <tr>
+                                    <th>項目</th>
+                                    <th>状態</th>
+                                </tr>
+                                <tr v-for="(item, key) in noteItems">
+                                    <td>{{ item }}</td>
+                                    <td :class="data.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
+                                        {{ data.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <h3>毛髪の状態</h3>
-                    <div class="content-wrapper">
-                        <table id="hair-status">
-                            <tr>
-                                <th>項目　　</th>
-                                <th>状態</th>
-                            </tr>
-                            <tr v-for="(item, key) in hairItems">
-                                <td>{{ item }}</td>
-                                <td>
-                                    {{ getHairStatusText(key, data.hair[0][key]) }}
-                                </td>
-                            </tr>
-                        </table>
+                        <h3>毛髪の状態</h3>
+                        <div class="content-wrapper">
+                            <table id="hair-status">
+                                <tr>
+                                    <th>項目　　</th>
+                                    <th>状態</th>
+                                </tr>
+                                <tr v-for="(item, key) in hairItems">
+                                    <td>{{ item }}</td>
+                                    <td>
+                                        {{ getHairStatusText(key, data.hair[0][key]) }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
 
                 <div class="page">
-                    <h3>頭皮の状態(トップ、サイド)</h3>
+                    <h3 class="margintop">頭皮の状態(トップ、サイド)</h3>
                     <div v-for="section in ['top', 'side']">
                         <h4>{{ getSectionName(section) }}</h4>
                         <div class="content-wrapper">
@@ -103,7 +110,7 @@
                 </div>
 
                 <div class="page">
-                    <h3>頭皮の状態(バック、ネープ)</h3>
+                    <h3 class="margintop">頭皮の状態(バック、ネープ)</h3>
                     <div v-for="section in ['back', 'nape']">
                         <h4>{{ getSectionName(section) }}</h4>
                         <div class="content-wrapper">
@@ -170,7 +177,7 @@
         }
 
         .status-normal {
-            color: green;
+            color: #4CAF50;
         }
 
         .status-caution {
@@ -222,6 +229,28 @@
             page-break-before: always;
         }
 
+        .back-button {
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .images {
+            display: flex;
+            justify-content: center;
+        }
+
+        .images img {
+            width: 100mm;
+            height: 100mm;
+        }
+
         @media print {
             @page {
                 margin: 0;
@@ -233,25 +262,25 @@
                 height: 297mm;
             }
 
+            .back-button {
+                display: none;
+            }
+
             .page {
                 page-break-before: always;
             }
 
-            .back-button {
-                display: none;
+            #comment {
+                height: 100mm;
             }
-        }
 
-        .back-button {
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
+            .marginleft {
+                margin-left: 60mm;
+            }
+
+            .margintop {
+                margin-top: 30mm;
+            }
         }
     </style>
 
