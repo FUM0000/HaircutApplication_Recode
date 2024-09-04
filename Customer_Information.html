@@ -128,7 +128,7 @@
                                     <v-card-title class="section-title d-flex align-center">
                                         <span class="white--text">診断日:</span>
                                         <v-select v-model="Selected_Data_Index"
-                                            :items="Customer.data.map((d, index) => ({ text: d.date, value: index }))"
+                                            :items="Customer.data.map((d, index) => ({ text: d.date.replace(/-/g, '/'), value: index }))"
                                             class="ml-4 date-select"
                                             style="max-width: 150px; padding-top: 20px;"></v-select>
                                         <v-spacer></v-spacer>
@@ -618,7 +618,7 @@
                     this.New_Exam_Date = null;
                 },
                 Delete_Exam_Date(Index) {
-                    if (confirm('この診断データを削除してもよろしいですか？')) {
+                    if (confirm('現在選択されている診断日のデータを削除してもよろしいですか？')) {
                         this.Customer.data.splice(Index, 1);
                         if (this.Customer.data.length > 0) {
                             this.Selected_Data_Index = 0;
@@ -653,7 +653,7 @@
                 },
                 Open_Print_Preview() {
                     const customerId = new URLSearchParams(window.location.search).get('id');
-                    window.open(`Customer_Information_Preview.html?id=${customerId}`, '_blank');
+                    window.open(`Customer_Information_Preview.html?id=${customerId}?date_index=${this.Selected_Data_Index}`, '_blank');
                 },
             },
         });

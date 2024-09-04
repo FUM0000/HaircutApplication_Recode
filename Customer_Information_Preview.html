@@ -10,7 +10,6 @@
 
 <body>
     <div id="app">
-        <button class="back-button" onclick="goBack()">戻る</button>
         <div class="page">
             <h1>お客様情報</h1>
             <div id="basic-info">
@@ -262,10 +261,6 @@
                 height: 297mm;
             }
 
-            .back-button {
-                display: none;
-            }
-
             .page {
                 page-break-before: always;
             }
@@ -286,10 +281,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script>
-        function goBack() {
-            const customerId = new URLSearchParams(window.location.search).get('id');
-            window.location.href = `Customer_Information.html?id=${customerId}`;
-        }
 
         new Vue({
             el: '#app',
@@ -331,6 +322,7 @@
             mounted() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const customerId = urlParams.get('id');
+                const customer_date_index = urlParams.get('date_index');
                 const customers = JSON.parse(localStorage.getItem("CustomerData"));
                 this.customer = customers.find(c => c.id === parseInt(customerId));
 
