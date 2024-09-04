@@ -1,61 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-
-<!-- ▼ Head ▼ ------------------------------------------------------------------------------------->
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-
     <link rel="shortcut icon" type="image/x-icon" href="./Asset/Image/Icon_1.ico">
-
-
-    <!-- ▼ Setting ▼ ---------------------------------------------------------------------------------->
     <meta name="version" content="0.0.1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <!-- ▲ Setting ▲ ---------------------------------------------------------------------------------->
-
-
-    <!-- ▼ Reference ▼ -------------------------------------------------------------------------------->
-    <!-- Vue -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-    <!-- CSS -->
     <link href="./Asset/CSS/Common_1.css" rel="stylesheet" />
-    <!-- ▲ Reference ▲ -------------------------------------------------------------------------------->
-
 
 </head>
-<!-- ▲ Head ▲ ------------------------------------------------------------------------------------->
-
-
-<!-- ▼ Body ▼ ------------------------------------------------------------------------------------->
 
 <body>
-
-
-    <!-- ▼ App ▼ -------------------------------------------------------------------------------------->
+    
     <v-app id="app">
         <template>
-
-
-            <!-- ▼ System bar ▼ ------------------------------------------------------------------------------->
             <main-system-bar :drawer="drawer" @change-drawer="Change_Drawer"><v-icon>mdi-cog</v-icon>設定</main-system-bar>
-            <!-- ▲ System bar ▲ ------------------------------------------------------------------------------->
-
-
-            <!-- ▼ Navigation ▼ ------------------------------------------------------------------------------->
             <main-navigation :drawer="drawer" @change-drawer="Change_Drawer"></main-navigation>
-            <!-- ▲ Navigation ▲ ------------------------------------------------------------------------------->
-
-
-            <!-- ▼ Main ▼ ------------------------------------------------------------------------------------->
+            
             <v-main id="main">
                 <v-container id="main-container" class="d-flex flex-column" fluid fill-height>
 
@@ -67,22 +36,12 @@
 
                         </div>
                     </transition>
-
-
                 </v-container>
             </v-main>
-            <!-- ▲ Main ▲ ------------------------------------------------------------------------------------->
-
-
         </template>
     </v-app>
-    <!-- ▲ App ▲ -------------------------------------------------------------------------------------->
-
-
-    <!-- ▼ Style ▼ ------------------------------------------------------------------------------------>
+    
     <style>
-
-        /* Fade */
         .fade-page-enter-active,
         .fade-page-leave-active {
             transition: opacity 2s;
@@ -93,29 +52,16 @@
             opacity: 0;
         }
     </style>
-    <!-- ▲ Style ▲ ------------------------------------------------------------------------------------>
-
-
-    <!-- ▼ Script Reference ▼ ------------------------------------------------------------------------->
-    <!-- Main -->
+    
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/lang/ja.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vector-js@4.1.1/dist/vector.min.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <!-- Compornent -->
     <script src="./Asset/Javascript/common.js"></script>
     <script src="./Asset/Javascript/main-system-bar.js"></script>
     <script src="./Asset/Javascript/main-navigation.js"></script>
-    <!-- ▲ Script Reference ▲ ------------------------------------------------------------------------->
-
-
-    <!-- ▼ Script Content ▼ --------------------------------------------------------------------------->
+    
     <script>
-
-
-        // Variable ----------------------------------------------------------------------
         let vue = new Vue({
             el: '#app',
             vuetify: new Vuetify(),
@@ -133,13 +79,7 @@
                 $(window).ready(() => { this.show_page = true; });
             }
         })
-
     </script>
-    <!-- ▲ Script Content ▲ --------------------------------------------------------------------------->
-
 
 </body>
-<!-- ▲ Body ▲ ------------------------------------------------------------------------------------->
-
-
 </html>
