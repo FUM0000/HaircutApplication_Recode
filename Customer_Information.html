@@ -560,10 +560,11 @@
                         let Link_Element = document.createElement('a');
                         Link_Element.setAttribute('href', Data_Uri);
                         Link_Element.setAttribute('download', Export_File_Default_Name);
-                        Link_Element.click();
+                        // Link_Element.click();
                         this.Edit_Mode = false;
                         this.Original_Customer = JSON.parse(JSON.stringify(this.Customer));
-                        alert('変更が保存され、顧客情報がエクスポートされました。');
+                        alert('変更が保存されました。');
+                        // alert('変更が保存され、顧客情報がエクスポートされました。');
                     }
                 },
                 Create_New_Exam_Data(Date) {

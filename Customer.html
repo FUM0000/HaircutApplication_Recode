@@ -462,10 +462,11 @@
                         this.FilteredCustomers = this.Customers;
                         this.SaveToLocalStorage();
                         this.SortCustomers();
-                        this.ExportData('all_customers_data.json');
+                        // this.ExportData('all_customers_data.json');
 
                         this.ResetNewCustomerForm();
-                        alert('新規追加され、顧客情報がエクスポートされました。');
+                        alert('新規追加されました。');
+                        // alert('新規追加され、顧客情報がエクスポートされました。');
                     }
                 },
                 ResetNewCustomerForm() {
@@ -516,6 +517,7 @@
                     linkElement.setAttribute('href', dataUri);
                     linkElement.setAttribute('download', filename);
                     linkElement.click();
+                    alert('顧客情報がエクスポートされました。');
                 },
             },
             mounted() {
