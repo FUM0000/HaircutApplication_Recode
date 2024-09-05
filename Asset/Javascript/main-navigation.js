@@ -19,10 +19,6 @@ Vue.component('main-navigation', {
                 <v-list-item-icon><v-icon>mdi-account-circle</v-icon></v-list-item-icon>
                 <v-list-item-title>顧客一覧</v-list-item-title>
             </v-list-item>
-            <v-list-item href="./Setting.html">
-                <v-list-item-icon><v-icon>mdi-cog</v-icon></v-list-item-icon>
-                <v-list-item-title>設定</v-list-item-title>
-            </v-list-item>
 
 
         </v-list>

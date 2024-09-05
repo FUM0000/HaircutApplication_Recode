@@ -8,13 +8,13 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
 </head>
 
-<body>
+<body style="padding: 50px;">
     <div id="app">
         <div class="page">
             <h1>お客様情報</h1>
             <div id="basic-info">
                 <table>
-                    <tr>
+                    <tr class="table-topleft">
                         <th>名前</th>
                         <td>{{ customer.name }}</td>
                         <th>カタカナ</th>
@@ -51,7 +51,7 @@
                         <h3 class="margintop">頭皮備考</h3>
                         <div class="content-wrapper">
                             <table>
-                                <tr>
+                                <tr class="table-topleft">
                                     <th>項目</th>
                                     <th>状態</th>
                                 </tr>
@@ -68,7 +68,7 @@
                         <h3>毛髪の状態</h3>
                         <div class="content-wrapper">
                             <table id="hair-status">
-                                <tr>
+                                <tr class="table-topleft">
                                     <th>項目　　</th>
                                     <th>状態</th>
                                 </tr>
@@ -89,7 +89,7 @@
                         <h4>{{ getSectionName(section) }}</h4>
                         <div class="content-wrapper">
                             <table>
-                                <tr>
+                                <tr class="table-topleft">
                                     <th>項目</th>
                                     <th>状態</th>
                                 </tr>
@@ -114,7 +114,7 @@
                         <h4>{{ getSectionName(section) }}</h4>
                         <div class="content-wrapper">
                             <table>
-                                <tr>
+                                <tr class="table-topleft">
                                     <th>項目</th>
                                     <th>状態</th>
                                 </tr>
@@ -154,9 +154,13 @@
 
         table {
             width: 45%;
-            border-collapse: collapse;
             margin-bottom: 20px;
             float: left;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         th,
@@ -169,6 +173,22 @@
         th {
             background-color: #4CAF50;
             color: white;
+        }
+
+        .table-topleft {
+            border-top-left-radius: 10px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 10px;
+        }
+
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
         }
 
         .status-good {
@@ -210,7 +230,6 @@
 
         #basic-info table {
             width: 100%;
-            border-collapse: collapse;
             margin-bottom: 20px;
         }
 
@@ -369,8 +388,6 @@
                     return statusClasses[value] || '';
                 },
                 getHairStatusText(key, value) {
-                    console.log(key);
-                    console.log(this.selectedData.hair[0]);
                     return this.hairLabels[key][value];
                 },
                 getImageSrc(customerName, examDate, section) {
