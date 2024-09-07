@@ -140,172 +140,157 @@
     </div>
 
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            width: 210mm;
-            height: 297mm;
-        }
+        @media screen, print {
+            body {
+                font-family: 'Roboto', sans-serif;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                width: 210mm;
+                height: 297mm;
+            }
 
-        .page {
-            position: relative;
-            width: 210mm;
-            height: 297mm;
-            page-break-after: always;
-            overflow: hidden;
-        }
+            .page {
+                position: relative;
+                width: 210mm;
+                height: 297mm;
+                page-break-after: always;
+                overflow: hidden;
+            }
 
-        .page-background {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: url('./Asset/Image/Background_1.png');
-            background-size: 100%;
-            background-repeat: no-repeat;
-            background-position: top center, bottom center;
-            z-index: -1;
-        }
+            .page-background {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background-image: url('./Asset/Image/Background_1.png');
+                background-size: 100%;
+                background-repeat: no-repeat;
+                background-position: top center, bottom center;
+                z-index: -1;
+            }
 
-        .page-background::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 45mm;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-image: url('./Asset/Image/Background_1.png');
-            background-size: 100%;
-            transform: rotate(180deg);
-        }
+            .page-background::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 45mm;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-image: url('./Asset/Image/Background_1.png');
+                background-size: 100%;
+                transform: rotate(180deg);
+            }
 
-        .page-content {
-            padding: 50px;
-            position: relative;
-            z-index: 1;
-        }
+            .page-content {
+                padding: 50px;
+                position: relative;
+                z-index: 1;
+            }
 
-        h1,
-        h2,
-        h3 {
-            color: #4CAF50;
-        }
+            h1, h2, h3 {
+                color: #4CAF50;
+            }
 
-        table {
-            width: 45%;
-            margin-bottom: 20px;
-            float: left;
-            border-collapse: separate;
-            border-spacing: 0;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+            table {
+                width: 45%;
+                margin-bottom: 20px;
+                float: left;
+                border-collapse: separate;
+                border-spacing: 0;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                overflow: hidden;
+            }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            background-color: white;
-        }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+                background-color: white;
+            }
 
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
+            th {
+                background-color: #4CAF50;
+                color: white;
+            }
 
-        .table-topleft {
-            border-top-left-radius: 10px;
-        }
+            .table-topleft {
+                border-top-left-radius: 10px;
+            }
 
-        th:last-child {
-            border-top-right-radius: 10px;
-        }
+            th:last-child {
+                border-top-right-radius: 10px;
+            }
 
-        tr:last-child td:first-child {
-            border-bottom-left-radius: 10px;
-        }
+            tr:last-child td:first-child {
+                border-bottom-left-radius: 10px;
+            }
 
-        tr:last-child td:last-child {
-            border-bottom-right-radius: 10px;
-        }
+            tr:last-child td:last-child {
+                border-bottom-right-radius: 10px;
+            }
 
-        .status-good {
-            color: blue;
-        }
+            .status-good { color: blue; }
+            .status-normal { color: #4CAF50; }
+            .status-caution { color: red; }
+            .status-none { color: blue; }
+            .status-exists { color: red; }
 
-        .status-normal {
-            color: #4CAF50;
-        }
+            .content-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
 
-        .status-caution {
-            color: red;
-        }
+            .scalp-image {
+                width: 45%;
+                text-align: center;
+            }
 
-        .status-none {
-            color: blue;
-        }
+            .scalp-image img {
+                max-width: 100%;
+                max-height: 300px;
+            }
 
-        .status-exists {
-            color: red;
-        }
+            #basic-info table {
+                width: 100%;
+                margin-bottom: 20px;
+            }
 
-        .content-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+            #basic-info th,
+            #basic-info td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
 
-        .scalp-image {
-            width: 45%;
-            text-align: center;
-        }
+            #hair-status td {
+                color: black;
+            }
 
-        .scalp-image img {
-            max-width: 100%;
-            max-height: 300px;
-        }
+            .images {
+                margin-top: 30mm;
+                display: flex;
+                justify-content: center;
+            }
 
-        #basic-info table {
-            width: 100%;
-            margin-bottom: 20px;
-        }
+            .images img {
+                width: 50mm;
+                height: 50mm;
+            }
 
-        #basic-info th,
-        #basic-info td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
+            #comment {
+                height: 80mm;
+            }
 
-        #hair-status td {
-            color: black;
-        }
+            .marginleft {
+                margin-left: 60mm;
+            }
 
-        .back-button {
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .images {
-            margin-top: 30mm;
-            display: flex;
-            justify-content: center;
-        }
-
-        .images img {
-            width: 50mm;
-            height: 50mm;
+            .margintop {
+                margin-top: 20mm;
+            }
         }
 
         @media print {
@@ -328,22 +313,6 @@
             .page-background::after {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-            }
-
-            #comment {
-                height: 80mm;
-            }
-
-            .images {
-                margin-top: 30mm;
-            }
-
-            .marginleft {
-                margin-left: 60mm;
-            }
-
-            .margintop {
-                margin-top: 30mm;
             }
         }
     </style>
@@ -448,7 +417,7 @@
 
                     const formattedDate = this.formatDate(examDate);
                     const sectionName = this.getSectionName(section);
-                    const imagePath = `./Asset/Image/${customerName}_${formattedDate}_${sectionName}.png`;
+                    const imagePath = `./Customer_Image/${customerName}_${formattedDate}_${sectionName}.png`;
 
                     const img = new Image();
                     img.onload = () => {

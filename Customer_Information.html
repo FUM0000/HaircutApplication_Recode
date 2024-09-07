@@ -506,7 +506,7 @@
                     const Customer_Name = this.Customer.name;
                     const Exam_Date = this.Format_Date(this.Selected_Data.date);
                     const Active_Section = this.Scalp_Sections[this.Active_Tab];
-                    const Image_Path = `./Asset/Image/${Customer_Name}_${Exam_Date}_${Active_Section}.png`;
+                    const Image_Path = `./Cutomer_Image/${Customer_Name}_${Exam_Date}_${Active_Section}.png`;
                     const Img = new Image();
                     Img.onload = () => {
                         this.Image_Src = Image_Path;
