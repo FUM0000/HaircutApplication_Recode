@@ -8,130 +8,133 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
 </head>
 
-<body style="padding: 50px;">
+<body>
     <div id="app">
-        <div class="page">
-            <h1>お客様情報</h1>
-            <div id="basic-info">
-                <table>
-                    <tr class="table-topleft">
-                        <th>名前</th>
-                        <td>{{ customer.name }}</td>
-                        <th>カタカナ</th>
-                        <td>{{ customer.nameKana }}</td>
-                    </tr>
-                    <tr>
-                        <th>性別</th>
-                        <td>{{ customer.sex }}</td>
-                        <th>生年月日</th>
-                        <td>{{ customer.birthday }}</td>
-                    </tr>
-                    <tr>
-                        <th>年齢</th>
-                        <td>{{ calculateAge(customer.birthday) }}歳</td>
-                        <th>電話番号</th>
-                        <td>{{ customer.phone }}</td>
-                    </tr>
-                </table>
-            </div>
+        <div v-for="(page, index) in pages" :key="index" class="page">
+            <div class="page-background"></div>
+            <div class="page-content">
+                <div v-if="index === 0">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h1>お客様情報</h1>
+                        <img src="./Asset/Image/Logo_1.png" alt="Logo" style="width: 100px; margin-left: auto;">
+                    </div>
+                    <div id="basic-info">
+                        <table>
+                            <tr class="table-topleft">
+                                <th>名前</th>
+                                <td>{{ customer.name }}</td>
+                                <th>カタカナ</th>
+                                <td>{{ customer.nameKana }}</td>
+                            </tr>
+                            <tr>
+                                <th>性別</th>
+                                <td>{{ customer.sex }}</td>
+                                <th>生年月日</th>
+                                <td>{{ customer.birthday }}</td>
+                            </tr>
+                            <tr>
+                                <th>年齢</th>
+                                <td>{{ calculateAge(customer.birthday) }}歳</td>
+                                <th>電話番号</th>
+                                <td>{{ customer.phone }}</td>
+                            </tr>
+                        </table>
+                    </div>
 
-            <h2>コメント</h2>
-            <p id="comment">{{ customer.comment }}</p>
+                    <h2>コメント</h2>
+                    <p id="comment" v-html="customer.comment.replace(/\n/g, '<br>')"></p>
 
-            <div class="images">
-                <img src="./Asset/Image/Test_1.png" alt="Test Image 1">
-                <img src="./Asset/Image/Test_1.png" alt="Test Image 2">
-            </div>
-
-            <div v-if="selectedData">
-                <div class="page">
-                    <h2>診断日: {{ selectedData.date }}</h2>
-
-                    <div class="marginleft">
-                        <h3 class="margintop">頭皮備考</h3>
-                        <div class="content-wrapper">
-                            <table>
-                                <tr class="table-topleft">
-                                    <th>項目</th>
-                                    <th>状態</th>
-                                </tr>
-                                <tr v-for="(item, key) in noteItems">
-                                    <td>{{ item }}</td>
-                                    <td
-                                        :class="selectedData.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
-                                        {{ selectedData.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <h3>毛髪の状態</h3>
-                        <div class="content-wrapper">
-                            <table id="hair-status">
-                                <tr class="table-topleft">
-                                    <th>項目　　</th>
-                                    <th>状態</th>
-                                </tr>
-                                <tr v-for="(item, key) in hairItems">
-                                    <td>{{ item }}</td>
-                                    <td>
-                                        {{ getHairStatusText(key, selectedData.hair[0][key]) }}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                    <div class="images">
+                        <img src="./Asset/Image/Head_Front_1.png" alt="Head_Front" style="margin-right: 5mm;">
+                        <img src="./Asset/Image/Head_Side_1.png" alt="Head_Side" style="margin-left: 5mm;">
                     </div>
                 </div>
+                    <div v-else-if="index === 1 && selectedData">
+                        <h2>診断日: {{ selectedData.date }}</h2>
 
-                <div class="page">
-                    <h3 class="margintop">頭皮の状態(トップ、サイド)</h3>
-                    <div v-for="section in ['top', 'side']">
-                        <h4>{{ getSectionName(section) }}</h4>
-                        <div class="content-wrapper">
-                            <table>
-                                <tr class="table-topleft">
-                                    <th>項目</th>
-                                    <th>状態</th>
-                                </tr>
-                                <tr v-for="(item, key) in scalpItems">
-                                    <td>{{ item }}</td>
-                                    <td :class="getStatusClass(selectedData.scalp[0][section][0][key])">
-                                        {{ getStatusText(selectedData.scalp[0][section][0][key]) }}
-                                    </td>
-                                </tr>
-                            </table>
-                            <div class="scalp-image">
-                                <img :src="getImageSrc(customer.name, selectedData.date, section)"
-                                    :alt="getSectionName(section)">
+                        <div class="marginleft">
+                            <h3 class="margintop">頭皮備考</h3>
+                            <div class="content-wrapper">
+                                <table>
+                                    <tr class="table-topleft">
+                                        <th>項目</th>
+                                        <th>状態</th>
+                                    </tr>
+                                    <tr v-for="(item, key) in noteItems">
+                                        <td>{{ item }}</td>
+                                        <td
+                                            :class="selectedData.scalp[0].remarks[0][key] ? 'status-exists' : 'status-none'">
+                                            {{ selectedData.scalp[0].remarks[0][key] ? 'あり' : 'なし' }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <h3>毛髪の状態</h3>
+                            <div class="content-wrapper">
+                                <table id="hair-status">
+                                    <tr class="table-topleft">
+                                        <th>項目　　</th>
+                                        <th>状態</th>
+                                    </tr>
+                                    <tr v-for="(item, key) in hairItems">
+                                        <td>{{ item }}</td>
+                                        <td>
+                                            {{ getHairStatusText(key, selectedData.hair[0][key]) }}
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="page">
-                    <h3 class="margintop">頭皮の状態(バック、ネープ)</h3>
-                    <div v-for="section in ['back', 'nape']">
-                        <h4>{{ getSectionName(section) }}</h4>
-                        <div class="content-wrapper">
-                            <table>
-                                <tr class="table-topleft">
-                                    <th>項目</th>
-                                    <th>状態</th>
-                                </tr>
-                                <tr v-for="(item, key) in scalpItems">
-                                    <td>{{ item }}</td>
-                                    <td :class="getStatusClass(selectedData.scalp[0][section][0][key])">
-                                        {{ getStatusText(selectedData.scalp[0][section][0][key]) }}
-                                    </td>
-                                </tr>
-                            </table>
-                            <div class="scalp-image">
-                                <img :src="getImageSrc(customer.name, selectedData.date, section)"
-                                    :alt="getSectionName(section)">
+                    <div v-else-if="index === 2 && selectedData">
+                        <h3 class="margintop">頭皮の状態(トップ、サイド)</h3>
+                        <div v-for="section in ['top', 'side']">
+                            <h4>{{ getSectionName(section) }}</h4>
+                            <div class="content-wrapper">
+                                <table>
+                                    <tr class="table-topleft">
+                                        <th>項目</th>
+                                        <th>状態</th>
+                                    </tr>
+                                    <tr v-for="(item, key) in scalpItems">
+                                        <td>{{ item }}</td>
+                                        <td :class="getStatusClass(selectedData.scalp[0][section][0][key])">
+                                            {{ getStatusText(selectedData.scalp[0][section][0][key]) }}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="scalp-image">
+                                    <img :src="getImageSrc(customer.name, selectedData.date, section)"
+                                        :alt="getSectionName(section)">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div v-else-if="index === 3 && selectedData">
+                        <h3 class="margintop">頭皮の状態(バック、ネープ)</h3>
+                        <div v-for="section in ['back', 'nape']">
+                            <h4>{{ getSectionName(section) }}</h4>
+                            <div class="content-wrapper">
+                                <table>
+                                    <tr class="table-topleft">
+                                        <th>項目</th>
+                                        <th>状態</th>
+                                    </tr>
+                                    <tr v-for="(item, key) in scalpItems">
+                                        <td>{{ item }}</td>
+                                        <td :class="getStatusClass(selectedData.scalp[0][section][0][key])">
+                                            {{ getStatusText(selectedData.scalp[0][section][0][key]) }}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="scalp-image">
+                                    <img :src="getImageSrc(customer.name, selectedData.date, section)"
+                                        :alt="getSectionName(section)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -140,10 +143,48 @@
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             box-sizing: border-box;
             width: 210mm;
             height: 297mm;
+        }
+
+        .page {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            page-break-after: always;
+            overflow: hidden;
+        }
+
+        .page-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('./Asset/Image/Background_1.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-position: top center, bottom center;
+            z-index: -1;
+        }
+
+        .page-background::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 45mm;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-image: url('./Asset/Image/Background_1.png');
+            background-size: 100%;
+            transform: rotate(180deg);
+        }
+
+        .page-content {
+            padding: 50px;
+            position: relative;
+            z-index: 1;
         }
 
         h1,
@@ -168,6 +209,7 @@
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            background-color: white;
         }
 
         th {
@@ -243,10 +285,6 @@
             color: black;
         }
 
-        .page {
-            page-break-before: always;
-        }
-
         .back-button {
             top: 20px;
             left: 20px;
@@ -260,13 +298,14 @@
         }
 
         .images {
+            margin-top: 30mm;
             display: flex;
             justify-content: center;
         }
 
         .images img {
-            width: 100mm;
-            height: 100mm;
+            width: 50mm;
+            height: 50mm;
         }
 
         @media print {
@@ -282,10 +321,21 @@
 
             .page {
                 page-break-before: always;
+                position: relative;
+            }
+
+            .page-background,
+            .page-background::after {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
             #comment {
-                height: 100mm;
+                height: 80mm;
+            }
+
+            .images {
+                margin-top: 30mm;
             }
 
             .marginleft {
@@ -304,6 +354,7 @@
         new Vue({
             el: '#app',
             data: {
+                pages: [1, 2, 3, 4],
                 customer: null,
                 selectedData: null,
                 scalpItems: {
