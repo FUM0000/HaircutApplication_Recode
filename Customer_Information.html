@@ -23,14 +23,14 @@
             <v-main id="main">
                 <v-container id="main-container" class="d-flex flex-column pa-4" fluid fill-height
                     style="max-width: 100%;">
-                    <transition name="fade-page">
-                        <div v-show="Show_Page">
+                    <v-fade-transition>
+                      <v-col v-if="Show_Page" style="max-width: 600px;">
                             <template v-if="Customer">
-                                <v-btn color="light-green lighten-3" class="mb-4"
+                                <v-btn color="light-green lighten-3" class="mb-4 mr-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Toggle_Edit_Mode">
                                     <b>{{ Edit_Mode ? '編集を破棄' : '編集' }}</b>
                                 </v-btn>
-                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 ml-4"
+                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 mr-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Open_Date_Picker">
                                     <b>＋新しい診断日を追加</b>
                                 </v-btn>
@@ -51,11 +51,11 @@
                                         </v-card-actions>
                                     </v-card>
                                 </v-dialog>
-                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 ml-4"
+                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 mr-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Save_Changes">
                                     <b>保存</b>
                                 </v-btn>
-                                <v-btn color="light-green lighten-3" class="mb-4 ml-4"
+                                <v-btn color="light-green lighten-3" class="mb-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Open_Print_Preview">
                                     <b>印刷プレビュー</b>
                                 </v-btn>
@@ -265,8 +265,8 @@
                                 </v-card>
                             </template>
 
-                        </div>
-                    </transition>
+                      </v-col>
+                    </v-fade-transition>
                 </v-container>
             </v-main>
         </template>
