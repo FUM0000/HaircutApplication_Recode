@@ -431,6 +431,7 @@
             },
             watch: {
                 Selected_Data_Index() {
+                    this.Active_Tab = 'トップ';
                     this.Reset_And_Update_Changed_Fields();
                     this.Get_Image_Src();
                 },
@@ -670,22 +671,51 @@
                 },
                 Handle_Data_Change(Field) {
                     if (!this.Is_New_Exam) {
-                        this.Mark_Field_As_Changed(Field);
+                        if (this.Compare_With_Original_Data(Field)) {
+                            Vue.delete(this.Changed_Fields, Field);
+                        } else {
+                            this.Mark_Field_As_Changed(Field);
+                        }
                     }
                 },
-                Reset_And_Update_Changed_Fields() {
-                    for (let field in this.Changed_Fields) {
-                        Vue.set(this.Changed_Fields, field, false);
+
+                Compare_With_Original_Data(Field) {
+                    const [category, section, item] = Field.split('.');
+                    const Current_Data = this.Customer.data[this.Selected_Data_Index];
+                    const Original_Data = this.Original_Customer.data.find(d => d.date === Current_Data.date);
+
+                    if (!Original_Data) {
+                        return false;
                     }
 
+                    if (category === 'scalp' && section === 'remarks') {
+                        return Current_Data[category][0][section][0][item] === Original_Data[category][0][section][0][item];
+                    } else if (category === 'scalp') {
+                        return Current_Data[category][0][section][0][item] === Original_Data[category][0][section][0][item];
+                    } else if (category === 'hair') {
+                        return Current_Data[category][0][item] === Original_Data[category][0][item];
+                    }
+
+                    return false;
+                },
+                Reset_And_Update_Changed_Fields() {
                     this.Changed_Fields = {};
 
-                    if (!this.Original_Customer || !this.Original_Customer.data[this.Selected_Data_Index]) {
+                    const Current_Data = this.Customer.data[this.Selected_Data_Index];
+
+                    this.Is_New_Exam = !this.Original_Customer || !this.Original_Customer.data.some(d => d.date === Current_Data.date);
+
+                    if (this.Is_New_Exam) {
+                        this.Mark_All_Fields_As_Changed();
                         return;
                     }
 
-                    const Original_Data = this.Original_Customer.data[this.Selected_Data_Index];
-                    const Current_Data = this.Customer.data[this.Selected_Data_Index];
+                    const Original_Data = this.Original_Customer.data.find(d => d.date === Current_Data.date);
+
+                    if (!Original_Data) {
+                        console.error('Original data not found for the selected date');
+                        return;
+                    }
 
                     for (let section in this.Scalp_Sections_Map) {
                         let english_section = this.Scalp_Sections_Map[section];
@@ -697,7 +727,7 @@
                     }
                     for (let item in this.Note_Items) {
                         if (Original_Data.scalp[0].remarks[0][item] !== Current_Data.scalp[0].remarks[0][item]) {
-                            Vue.set(this.Changed_Fields, `hair.${item}`, true);
+                            Vue.set(this.Changed_Fields, `scalp.remarks.${item}`, true);
                         }
                     }
                     for (let item in this.Hair_Items) {
@@ -706,6 +736,21 @@
                         }
                     }
                 },
+
+                Mark_All_Fields_As_Changed() {
+                    for (let section in this.Scalp_Sections_Map) {
+                        let english_section = this.Scalp_Sections_Map[section];
+                        for (let item in this.Scalp_Items) {
+                            Vue.set(this.Changed_Fields, `scalp.${english_section}.${item}`, true);
+                        }
+                    }
+                    for (let item in this.Note_Items) {
+                        Vue.set(this.Changed_Fields, `scalp.remarks.${item}`, true);
+                    }
+                    for (let item in this.Hair_Items) {
+                        Vue.set(this.Changed_Fields, `hair.${item}`, true);
+                    }
+                }
             },
         });
 
