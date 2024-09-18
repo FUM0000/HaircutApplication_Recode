@@ -24,7 +24,7 @@
                 <v-container id="main-container" class="d-flex flex-column pa-4" fluid fill-height
                     style="max-width: 100%;">
                     <v-fade-transition>
-                      <v-col v-if="Show_Page" style="max-width: 600px;">
+                        <v-col v-if="Show_Page" style="max-width: 600px;">
                             <template v-if="Customer">
                                 <v-btn color="light-green lighten-3" class="mb-4 mr-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Toggle_Edit_Mode">
@@ -169,7 +169,8 @@
                                                                             <v-radio-group
                                                                                 v-model="Selected_Data.scalp[0][Scalp_Sections_Map[section]][0][key]"
                                                                                 row :disabled="!Edit_Mode"
-                                                                                :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }">
+                                                                                :class="{ 'edited': Edit_Mode && Is_Field_Changed(`scalp.${Scalp_Sections_Map[section]}.${key}`) }"
+                                                                                @change="Handle_Data_Change(`scalp.${Scalp_Sections_Map[section]}.${key}`)">
                                                                                 <v-col class="col-radio"><v-radio
                                                                                         class="custom-radio"
                                                                                         :value="1"></v-radio></v-col>
@@ -207,7 +208,8 @@
                                                     <v-col style="margin: 0; padding: 0;">
                                                         <v-radio-group v-model="Selected_Data.scalp[0].remarks[0][key]"
                                                             row :disabled="!Edit_Mode"
-                                                            :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }">
+                                                            :class="{ 'edited': Edit_Mode && Is_Field_Changed(`hair.${key}`) }"
+                                                            @change="Handle_Data_Change(`hair.${key}`)">
                                                             <v-col class="col-radio"><v-radio :value="false"
                                                                     class="custom-radio"></v-radio></v-col>
                                                             <v-col class="col-radio"><v-radio :value="true"
@@ -230,8 +232,9 @@
                                                     <span class="status-item ml-4">{{ item }}</span>
                                                     <v-col style="padding-top: 0; padding-bottom: 0;">
                                                         <v-radio-group v-model="Selected_Data.hair[0][key]" row
-                                                            style="margin-top: 0;" :disabled="!Edit_Mode"
-                                                            :class="{ 'edited': Edit_Mode && Customer.comment !== Original_Customer.comment }">
+                                                            :disabled="!Edit_Mode"
+                                                            :class="{ 'edited': Edit_Mode && Is_Field_Changed(`hair.${key}`) }"
+                                                            @change="Handle_Data_Change(`hair.${key}`)">
                                                             <v-col class="col-radio"><v-radio class="custom-radio"
                                                                     :label="Hair_Labels[key][1]"
                                                                     :value="1"></v-radio></v-col>
@@ -265,7 +268,7 @@
                                 </v-card>
                             </template>
 
-                      </v-col>
+                        </v-col>
                     </v-fade-transition>
                 </v-container>
             </v-main>
@@ -423,9 +426,12 @@
                 Birthday_Menu: false,
                 Selected_Data_Index: 0,
                 Image_Src: './Asset/Image/Test_1.png',
+                Changed_Fields: {},
+                Is_New_Exam: false,
             },
             watch: {
                 Selected_Data_Index() {
+                    this.Reset_And_Update_Changed_Fields();
                     this.Get_Image_Src();
                 },
                 Active_Tab() {
@@ -439,7 +445,7 @@
                         : null;
                 },
                 Is_Data_Edited() {
-                    return JSON.stringify(this.Customer) !== JSON.stringify(this.Original_Customer);
+                    return this.Is_New_Exam || Object.keys(this.Changed_Fields).length > 0 || JSON.stringify(this.Customer) !== JSON.stringify(this.Original_Customer);
                 },
                 Formatted_Birthday() {
                     if (!this.Customer.birthday) return '';
@@ -478,14 +484,8 @@
                 Go_Back() {
                     window.history.back();
                 },
-                Change_Scalp_Status(Section, Key) {
-                    let English_Section = this.Scalp_Sections_Map[Section];
-                    let Current_Value = this.Selected_Data.scalp[0][English_Section][0][Key];
-                    this.Selected_Data.scalp[0][English_Section][0][Key] = (Current_Value % 3) + 1;
-                },
-                Change_Hair_Status(Key) {
-                    let Current_Value = this.Selected_Data.hair[0][Key];
-                    this.Selected_Data.hair[0][Key] = (Current_Value % 3) + 1;
+                Mark_Field_As_Changed(Field) {
+                    Vue.set(this.Changed_Fields, Field, true);
                 },
                 Calculate_Age(Birthday) {
                     const Birth_Date = new Date(Birthday);
@@ -531,14 +531,15 @@
                         } else {
                             this.Selected_Data_Index = null;
                         }
+                        this.Changed_Fields = {};
+                        this.Is_New_Exam = false;
                     }
                 },
                 Toggle_Edit_Mode() {
                     if (this.Edit_Mode) {
                         if (this.Is_Data_Edited) {
                             if (confirm('変更を破棄しますか？')) {
-                                this.Customer = JSON.parse(JSON.stringify(this.Original_Customer));
-                                this.Selected_Data_Index = 0;
+                                this.Reset_Customer_Data();
                             } else {
                                 return;
                             }
@@ -547,6 +548,8 @@
                         this.Original_Customer = JSON.parse(JSON.stringify(this.Customer));
                     }
                     this.Edit_Mode = !this.Edit_Mode;
+                    this.Changed_Fields = {};
+                    this.Is_New_Exam = false;
                 },
                 Save_Changes() {
                     if (this.Is_Data_Edited) {
@@ -605,18 +608,24 @@
 
                     const Formatted_Date = new Date(this.New_Exam_Date).toISOString().split('T')[0];
 
-                    if (this.Customer.data.some(d => d.date === Formatted_Date)) {
-                        alert('この日付の診断データは既に存在します。');
-                        return;
+                    const Existing_Data_Index = this.Customer.data.findIndex(d => d.date === Formatted_Date);
+
+                    if (Existing_Data_Index !== -1) {
+                        this.Selected_Data_Index = Existing_Data_Index;
+                        this.Show_Date_Picker = false;
+                        this.New_Exam_Date = null;
+                        this.Is_New_Exam = false;
+                        this.Changed_Fields = {};
+                    } else {
+                        const New_Data = this.Create_New_Exam_Data(Formatted_Date);
+                        this.Customer.data.push(New_Data);
+                        this.Customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                        this.Selected_Data_Index = this.Customer.data.findIndex(d => d.date === Formatted_Date);
+                        this.Show_Date_Picker = false;
+                        this.New_Exam_Date = null;
+                        this.Is_New_Exam = true;
+                        this.Changed_Fields = {};
                     }
-
-                    const New_Data = this.Create_New_Exam_Data(Formatted_Date);
-
-                    this.Customer.data.push(New_Data);
-                    this.Customer.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                    this.Selected_Data_Index = this.Customer.data.findIndex(d => d.date === Formatted_Date);
-                    this.Show_Date_Picker = false;
-                    this.New_Exam_Date = null;
                 },
                 Delete_Exam_Date(Index) {
                     if (confirm('現在選択されている診断日のデータを削除してもよろしいですか？')) {
@@ -655,6 +664,47 @@
                 Open_Print_Preview() {
                     const customerId = new URLSearchParams(window.location.search).get('id');
                     window.open(`Customer_Information_Preview.html?id=${customerId}&date_index=${this.Selected_Data_Index}`, '_blank');
+                },
+                Is_Field_Changed(Field) {
+                    return this.Is_New_Exam || this.Changed_Fields[Field];
+                },
+                Handle_Data_Change(Field) {
+                    if (!this.Is_New_Exam) {
+                        this.Mark_Field_As_Changed(Field);
+                    }
+                },
+                Reset_And_Update_Changed_Fields() {
+                    for (let field in this.Changed_Fields) {
+                        Vue.set(this.Changed_Fields, field, false);
+                    }
+
+                    this.Changed_Fields = {};
+
+                    if (!this.Original_Customer || !this.Original_Customer.data[this.Selected_Data_Index]) {
+                        return;
+                    }
+
+                    const Original_Data = this.Original_Customer.data[this.Selected_Data_Index];
+                    const Current_Data = this.Customer.data[this.Selected_Data_Index];
+
+                    for (let section in this.Scalp_Sections_Map) {
+                        let english_section = this.Scalp_Sections_Map[section];
+                        for (let item in this.Scalp_Items) {
+                            if (Original_Data.scalp[0][english_section][0][item] !== Current_Data.scalp[0][english_section][0][item]) {
+                                Vue.set(this.Changed_Fields, `scalp.${english_section}.${item}`, true);
+                            }
+                        }
+                    }
+                    for (let item in this.Note_Items) {
+                        if (Original_Data.scalp[0].remarks[0][item] !== Current_Data.scalp[0].remarks[0][item]) {
+                            Vue.set(this.Changed_Fields, `hair.${item}`, true);
+                        }
+                    }
+                    for (let item in this.Hair_Items) {
+                        if (Original_Data.hair[0][item] !== Current_Data.hair[0][item]) {
+                            Vue.set(this.Changed_Fields, `hair.${item}`, true);
+                        }
+                    }
                 },
             },
         });
