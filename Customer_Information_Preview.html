@@ -19,7 +19,7 @@
                 <div v-if="index === 0">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <h1>お客様情報</h1>
-                        <img src="./Asset/Image/Logo_1.png" alt="Logo" style="width: 100px; margin-left: auto;">
+                        <img src="./Asset/Image/Logo_1.png" alt="Logo" style="width: 100px; margin-left: auto; background-color: rgba(255, 255, 255, 0.75);">
                     </div>
                     <div id="basic-info">
                         <table>
@@ -144,10 +144,17 @@
     </div>
 
     <style>
+        @font-face {
+            font-family: 'UtsukushiFont';
+            src: url('./Asset/Font/UtsukushiFONT.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         @media screen,
         print {
             body {
-                font-family: 'Roboto', sans-serif;
+                font-family: 'UtsukushiFont', 'Roboto', sans-serif;
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;

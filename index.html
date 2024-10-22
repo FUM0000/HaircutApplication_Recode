@@ -39,8 +39,8 @@
                                         label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="Search"
                                         @click:clear="Clear_Search" :style="{ 'max-width': '512px', 'width': '90%' }">
                                     </v-text-field>
-                                    <v-btn @click="ShowAddCustomerDialog = true"
-                                        class="Main_Button ml-4" :style="{ height: '48px', color: '#404040' }"><b>＋新規追加</b></v-btn>
+                                    <v-btn @click="NavigateToAddCustomer" class="Main_Button ml-4"
+                                        :style="{ height: '48px', color: '#404040' }"><b>＋新規追加</b></v-btn>
                                 </v-col>
                             </v-row>
 
@@ -219,6 +219,10 @@
                         this.Customers = JSON.parse(storedData);
                     }
                 },
+
+                NavigateToAddCustomer() {
+                    window.location.href = './Customer.html?action=add';
+                }
             },
         })
     </script>
