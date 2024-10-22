@@ -41,8 +41,8 @@
                                         label="顧客検索 (氏名もしくは電話番号) *カタカナ可" solo rounded clearable @input="Search"
                                         @click:clear="ClearSearch" :style="{ 'max-width': '512px', 'width': '90%' }">
                                     </v-text-field>
-                                    <v-btn color="light-green lighten-3" @click="ShowAddCustomerDialog = true"
-                                        class="ml-4" :style="{ height: '48px', color: '#404040' }"><b>＋新規追加</b></v-btn>
+                                    <v-btn @click="ShowAddCustomerDialog = true"
+                                        class="Main_Button ml-4" :style="{ height: '48px', color: '#404040' }"><b>＋新規追加</b></v-btn>
                                 </v-col>
                             </v-row>
 
@@ -82,7 +82,8 @@
                                     </v-card-text>
                                     <v-card-actions style="padding-bottom: 20px;">
                                         <v-spacer></v-spacer>
-                                        <v-btn color="light-green darken-1" text
+                                        <v-btn text
+                                            :class="{'Main_Button': NewCustomerName && NewCustomerNameKana}"
                                             :disabled="!NewCustomerName || !NewCustomerNameKana"
                                             @click="AddCustomer">追加</v-btn>
                                         <v-btn color="grey darken-1" text @click="Cancel">キャンセル</v-btn>

@@ -6,3 +6,10 @@ html::-webkit-scrollbar{
 body { background: rgb(216, 238, 221); }
 #app { background-color: rgb(216, 238, 221); }
 .v-application { background-color: rgb(216, 238, 221); }
+
+.Main_Button {
+    background-color: #ef9a9a !important;
+}
+.Sub_Button {
+    background-color: #C5E1A5   !important;
+}

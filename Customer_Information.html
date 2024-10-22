@@ -27,11 +27,12 @@
                     <v-fade-transition>
                         <v-col v-if="Show_Page" style="max-width: 600px;">
                             <template v-if="Customer">
-                                <v-btn color="light-green lighten-3" class="mb-4 mr-4"
+                                <v-btn class="mb-4 mr-4" :class="Edit_Mode ? 'Sub_Button' : 'Main_Button'"
                                     :style="{ height: '48px', color: '#404040' }" @click="Toggle_Edit_Mode">
                                     <b>{{ Edit_Mode ? '編集を破棄' : '編集' }}</b>
                                 </v-btn>
-                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 mr-4"
+                                <v-btn v-if="Edit_Mode" class="mb-4 mr-4"
+                                    :class="Is_Data_Edited ? 'Sub_Button' : 'Main_Button'"
                                     :style="{ height: '48px', color: '#404040' }" @click="Open_Date_Picker">
                                     <b>＋新しい診断日を追加</b>
                                 </v-btn>
@@ -52,11 +53,11 @@
                                         </v-card-actions>
                                     </v-card>
                                 </v-dialog>
-                                <v-btn v-if="Edit_Mode" color="light-green lighten-3" class="mb-4 mr-4"
+                                <v-btn v-if="Edit_Mode && Is_Data_Edited" class="Main_Button mb-4 mr-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Save_Changes">
                                     <b>保存</b>
                                 </v-btn>
-                                <v-btn color="light-green lighten-3" class="mb-4"
+                                <v-btn v-if="!Edit_Mode" color="light-green lighten-3" class="mb-4"
                                     :style="{ height: '48px', color: '#404040' }" @click="Open_Print_Preview">
                                     <b>印刷プレビュー</b>
                                 </v-btn>
@@ -133,9 +134,9 @@
                                             class="ml-4 date-select"
                                             style="max-width: 150px; padding-top: 20px;"></v-select>
                                         <v-spacer></v-spacer>
-                                        <v-btn v-if="Edit_Mode" color="error"
+                                        <v-btn v-if="Edit_Mode" color="light-green lighten-3" :style="{ color: '#404040' }"
                                             @click="Delete_Exam_Date(Selected_Data_Index)">
-                                            診断データを削除
+                                            この診断日データを削除
                                         </v-btn>
                                     </v-card-title>
                                     <v-card-text>
@@ -631,6 +632,20 @@
                         this.Is_New_Exam = true;
                         this.Changed_Fields = {};
                     }
+
+                    this.$nextTick(() => {
+                        const dateSelectElement = document.querySelector('.date-select');
+                        if (dateSelectElement) {
+                            const offset = 20; // スクロール位置の微調整用オフセット
+                            const elementPosition = dateSelectElement.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+                            window.scrollTo({
+                                top: offsetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
                 },
                 Delete_Exam_Date(Index) {
                     if (confirm('現在選択されている診断日のデータを削除してもよろしいですか？')) {
