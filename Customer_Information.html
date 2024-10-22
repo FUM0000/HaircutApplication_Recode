@@ -49,7 +49,8 @@
                                             <v-spacer></v-spacer>
                                             <v-btn color="blue darken-1" text
                                                 @click="Show_Date_Picker = false">キャンセル</v-btn>
-                                            <v-btn color="blue darken-1" text @click="Add_New_Exam_Date">追加</v-btn>
+                                            <v-btn :class="{'Main_Button': New_Exam_Date}" text @click="Add_New_Exam_Date"
+                                            :disabled="!New_Exam_Date">追加</v-btn>
                                         </v-card-actions>
                                     </v-card>
                                 </v-dialog>
