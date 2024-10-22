@@ -210,8 +210,8 @@
                                                     <v-col style="margin: 0; padding: 0;">
                                                         <v-radio-group v-model="Selected_Data.scalp[0].remarks[0][key]"
                                                             row :disabled="!Edit_Mode"
-                                                            :class="{ 'edited': Edit_Mode && Is_Field_Changed(`hair.${key}`) }"
-                                                            @change="Handle_Data_Change(`hair.${key}`)">
+                                                            :class="{ 'edited': Edit_Mode && Is_Field_Changed(`scalp.remarks.${key}`) }"
+                                                            @change="Handle_Data_Change(`scalp.remarks.${key}`)">
                                                             <v-col class="col-radio"><v-radio :value="false"
                                                                     class="custom-radio"></v-radio></v-col>
                                                             <v-col class="col-radio"><v-radio :value="true"
@@ -689,7 +689,7 @@
                     return this.Is_New_Exam || this.Changed_Fields[Field];
                 },
                 Handle_Data_Change(Field) {
-                    if (!this.Is_New_Exam) {
+                    if (!this.Is_New_Exam) { console.log(Field);
                         if (this.Compare_With_Original_Data(Field)) {
                             Vue.delete(this.Changed_Fields, Field);
                         } else {
@@ -699,7 +699,8 @@
                 },
 
                 Compare_With_Original_Data(Field) {
-                    const [category, section, item] = Field.split('.');
+                    const [category, section, item] = Field.split('.'); console.log(category, section, item);
+                    
                     const Current_Data = this.Customer.data[this.Selected_Data_Index];
                     const Original_Data = this.Original_Customer.data.find(d => d.date === Current_Data.date);
 
@@ -712,7 +713,7 @@
                     } else if (category === 'scalp') {
                         return Current_Data[category][0][section][0][item] === Original_Data[category][0][section][0][item];
                     } else if (category === 'hair') {
-                        return Current_Data[category][0][item] === Original_Data[category][0][item];
+                        return Current_Data[category][0][section] === Original_Data[category][0][section];
                     }
 
                     return false;
